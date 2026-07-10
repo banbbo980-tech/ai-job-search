@@ -1,0 +1,4 @@
+interface:
+  display_name: "Job Apply"
+  short_description: "Create tailored job application packages"
+  default_prompt: "Use $job-apply for this job posting: <URL or pasted posting>."

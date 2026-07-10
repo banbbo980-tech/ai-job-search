@@ -1,0 +1,4 @@
+interface:
+  display_name: "Profile Expand"
+  short_description: "Add supported skills to the profile"
+  default_prompt: "Use $profile-expand to enrich my profile from documents and public sources."

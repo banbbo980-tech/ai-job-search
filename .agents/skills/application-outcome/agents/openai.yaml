@@ -1,0 +1,4 @@
+interface:
+  display_name: "Application Outcome"
+  short_description: "Record application outcomes safely"
+  default_prompt: "Use $application-outcome to record what happened with <company>."

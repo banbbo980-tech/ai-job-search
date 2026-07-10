@@ -1,0 +1,4 @@
+interface:
+  display_name: "Job Rank"
+  short_description: "Score and shortlist scraped jobs"
+  default_prompt: "Use $job-rank to triage my scraped jobs."

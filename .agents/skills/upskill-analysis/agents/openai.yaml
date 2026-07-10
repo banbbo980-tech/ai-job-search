@@ -1,0 +1,4 @@
+interface:
+  display_name: "Upskill Analysis"
+  short_description: "Analyze gaps and plan learning"
+  default_prompt: "Use $upskill-analysis to identify what I should learn next."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Add Document Template"
+  short_description: "Register LaTeX application templates"
+  default_prompt: "Use $add-document-template to register my LaTeX template."

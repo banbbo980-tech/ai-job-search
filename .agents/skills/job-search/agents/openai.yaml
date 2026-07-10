@@ -1,0 +1,4 @@
+interface:
+  display_name: "Job Search"
+  short_description: "Search job portals and deduplicate jobs"
+  default_prompt: "Use $job-search to find new matching jobs."

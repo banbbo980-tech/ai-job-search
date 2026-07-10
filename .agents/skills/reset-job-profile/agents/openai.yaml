@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reset Job Profile"
+  short_description: "Reset job profile data safely"
+  default_prompt: "Use $reset-job-profile profile to reset my profile safely."
