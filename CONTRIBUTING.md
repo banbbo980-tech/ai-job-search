@@ -4,11 +4,11 @@ Thanks for considering a contribution! This repo has a deliberate, narrow philos
 
 ## The one rule everything follows from
 
-**This repo is a universal template.** People fork it and adapt it to their own market, language, and profile. Upstream stays market-agnostic, person-agnostic, and Claude Code-native. The corollary: a contribution is judged by fit to this rule first, execution quality second. Well-built but off-policy still gets declined (kindly, with reasons).
+**This repo is a universal template.** People fork it and adapt it to their own market, language, and profile. Upstream stays market-agnostic, person-agnostic, and Codex-native. The corollary: a contribution is judged by fit to this rule first, execution quality second. Well-built but off-policy still gets declined (kindly, with reasons).
 
 ## What gets merged
 
-- **Universal customization features**: anything that makes the fork-and-adapt path better for everyone. Precedent: `/add-template` ([#30]), `/add-portal` ([#37]).
+- **Universal customization features**: anything that makes the fork-and-adapt path better for everyone. Precedent: `$add-document-template` and `$add-job-portal`.
 - **Robustness and correctness fixes** with the failing case demonstrated. Precedent: NaN flag validation ([#35]), HTML entity decoding ([#55], [#56]), salary column detection ([#64]).
 - **Docs that close real gaps**: platform-specific setup ([#41], [#60]), stale references ([#36], [#68]).
 - **Infrastructure that reduces review burden** and is argued from evidence, not speculation. Precedent: CI ([#59]), which caught a latent bug while being built.
@@ -23,7 +23,7 @@ Thanks for considering a contribution! This repo has a deliberate, narrow philos
 
 ## The bar for new commands
 
-The core lifecycle is **feature-complete**: `/setup` → `/scrape` → `/rank` → `/apply` → `/interview` → `/outcome` → calibration back into `/setup`, with `/expand`, `/upskill`, `/add-template`, `/add-portal`, and `/reset` around it. Every stage of a real job hunt has an owner.
+The core lifecycle is **feature-complete**: `$job-setup` -> `$job-search` -> `$job-rank` -> `$job-apply` -> `$interview-prep` -> `$application-outcome` -> calibration back into `$job-setup`, with `$profile-expand`, `$upskill-analysis`, `$add-document-template`, `$add-job-portal`, and `$reset-job-profile` around it. Every stage of a real job hunt has an owner.
 
 A new command therefore faces a high bar. The test that admitted the existing ones: **does it operationalize something error-prone that already exists in the framework** (documented machinery nothing executes, data something writes but nothing reads)? "Useful" and "possible" are not sufficient; the strongest proposals connect two things that already exist without modifying either ([#43], [#54]).
 
@@ -39,14 +39,14 @@ Reviews here are empirical. Bug reports are reproduced on master before the fix 
 
 ## Building for your own market? Do this instead
 
-1. Fork the repo and run `/add-portal` with your local job board - it scaffolds a portal skill matching the shipped contract, and `/scrape` picks it up automatically.
+1. Fork the repo and run `$add-job-portal` with your local job board - it scaffolds a portal skill matching the shipped contract, and `$job-search` picks it up automatically.
 2. Announce your fork in the pinned [Community forks & adaptations](https://github.com/MadsLorentzen/ai-job-search/discussions/78) discussion so others can find it.
 
 Market-specific skills are genuinely valuable - they just live in forks, where their maintainers can test them and their users can find them.
 
 ## Practical notes
 
-- **Portal-skill contract**: `search`/`detail` commands, `--format json|table|plain`, stderr JSON errors with exit 1, backoff on 429/5xx, zero runtime dependencies by default. See `/add-portal`'s spec and `linkedin-search` as the reference implementation.
+- **Portal-skill contract**: `search`/`detail` commands, `--format json|table|plain`, stderr JSON errors with exit 1, backoff on 429/5xx, zero runtime dependencies by default. See `$add-job-portal`'s spec and `linkedin-search` as the reference implementation.
 - **Personal-use boundaries**: portal skills that touch ToS-restricted sources carry a prominent personal-use-only warning, and CI deliberately makes no live portal requests. Don't "fix" that.
 - **LaTeX changes**: both templates must compile (`lualatex` for the CV, `xelatex` for the cover letter) and hold their exact page counts. CI smoke-checks this.
 

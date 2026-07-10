@@ -43,6 +43,7 @@ jobs:
           python-version: "3.12"
       - run: pip install pyyaml
       - run: python tools/lint_skills.py
+      - run: python tools/codex_compatibility.py
 
   security-guards:
     name: Security guards (permissions, gitignore, manifests)
