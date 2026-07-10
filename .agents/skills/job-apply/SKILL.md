@@ -158,6 +158,9 @@ Inspect extracted text for:
 - Reading order matching visual order.
 - Recognizable dates.
 - Supported keyword coverage without stuffing.
+- Keyword status categories should preserve the original distinction: covered,
+  synonym-only, missing but genuinely supported by the profile, and missing (gap)
+  where the candidate does not have the requirement.
 
 Delete the extracted `.txt` after the final check. If `pdftotext` is missing,
 report reduced ATS verification and perform a visual keyword review only.

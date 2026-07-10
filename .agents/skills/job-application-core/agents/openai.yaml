@@ -1,4 +1,4 @@
 interface:
   display_name: "Job Application Core"
   short_description: "Shared profile and application rules"
-  default_prompt: "Use -application-core to inspect the shared job-search references."
+  default_prompt: "Use $job-application-core to inspect the shared job-search references."

@@ -1,5 +1,7 @@
 # AI Job Search Codex Guide
 
+## Project Purpose
+
 This repository is a local-first job-search and application workspace for OpenAI
 Codex and ChatGPT Work. It helps a candidate build a profile, search and rank
 jobs, generate tailored LaTeX CVs and cover letters, prepare for interviews,
