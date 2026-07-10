@@ -1,0 +1,12 @@
+{
+  "seen": {
+    "https://example.com/jobs/analytics-engineer": {
+      "title": "Analytics Engineer",
+      "company": "Example Climate Tools",
+      "url": "https://example.com/jobs/analytics-engineer",
+      "first_seen": "2099-01-01",
+      "fit": "high",
+      "status": "new"
+    }
+  }
+}

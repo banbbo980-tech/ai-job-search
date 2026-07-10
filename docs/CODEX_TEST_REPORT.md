@@ -9,7 +9,7 @@ Branch: `codex-migration`
 | Command | Result |
 |---|---|
 | `python tools/codex_compatibility.py` | `codex_compatibility: OK (12 workflow skills, 8 shared references, AGENTS.md)` |
-| `python -m unittest discover -s tests -t . -v` | 61 tests passed |
+| `python -m unittest discover -s tests -t . -v` | 68 tests passed |
 | `python tools/lint_skills.py` | `lint_skills: OK (21 skills, 9 commands, settings.json)` |
 | `python tools/security_guards.py` | `security_guards: OK (permissions allowlist, gitignore rules, package manifests)` |
 
@@ -29,6 +29,8 @@ These checks require tools not currently available on this machine's PATH:
 - Codex workflow skills preserve the original setup, search, rank, apply,
   reviewer, compile, ATS, interview, outcome, upskill, template, portal, and
   reset workflows.
+- Sanitized fixtures under `tests/fixtures/` exercise the expected local data
+  shapes without committing real personal information.
 - Legacy `.claude/` files remain in the repo until final parity cleanup.
 - Live portal requests were not automated in local tests, matching upstream CI's
   deliberate avoidance of live job-board traffic.
