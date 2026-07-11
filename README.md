@@ -1,5 +1,9 @@
 # AI Job Search
 
+<p align="center">
+  <a href="https://trendshift.io/repositories/43622?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-43622" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/43622/daily" alt="MadsLorentzen%2Fai-job-search | Trendshift" width="250" height="55"/></a>
+</p>
+
 AI Job Search is a local-first Codex workspace for managing a real job search:
 profile setup, job discovery, fit ranking, tailored LaTeX CVs and cover letters,
 review, PDF/ATS checks, interview preparation, outcome tracking, and upskill
@@ -8,6 +12,10 @@ planning.
 This is an independent MIT-licensed project migrated from the original
 Claude Code-oriented workflow by Mads Lorentzen. It is not affiliated with,
 endorsed by, sponsored by, or maintained by OpenAI, Anthropic, or any job portal.
+
+> This project has **no affiliated cryptocurrency, token, coin, or paid
+> sponsorship program**. Any claim about an official AI Job Search coin or token
+> is fraudulent or unaffiliated.
 
 ## What It Does
 
