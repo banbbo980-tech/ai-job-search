@@ -106,6 +106,14 @@ class PermissionGuardTests(GuardRepoFixture):
                 self.assertIn(message, result.stdout)
                 self.assertNotIn("Traceback", result.stderr)
 
+    def test_missing_permissions_entries_are_treated_as_narrowing(self):
+        for data in [{}, {"permissions": {}}]:
+            with self.subTest(data=data):
+                self.settings.write_text(json.dumps(data))
+                result = run_guards(self.root)
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+                self.assertNotIn("Traceback", result.stderr)
+
 
 class GitignoreGuardTests(GuardRepoFixture):
     def test_each_missing_personal_data_rule_fails(self):
@@ -152,6 +160,7 @@ class ManifestGuardTests(GuardRepoFixture):
         for data, message in [
             ([], "top-level JSON value must be an object"),
             ({"name": "example-cli", "scripts": []}, "scripts must be an object"),
+            ({"name": "example-cli", "scripts": None}, "scripts must be an object"),
         ]:
             with self.subTest(data=data):
                 self.write_manifest(data)
@@ -159,6 +168,18 @@ class ManifestGuardTests(GuardRepoFixture):
                 self.assertEqual(result.returncode, 1)
                 self.assertIn(message, result.stdout)
                 self.assertNotIn("Traceback", result.stderr)
+
+    def test_invalid_manifest_json_fails_cleanly(self):
+        self.manifest.write_text("{not json")
+        result = run_guards(self.root)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("invalid JSON", result.stdout)
+        self.assertNotIn("Traceback", result.stderr)
+
+    def test_manifest_without_scripts_passes(self):
+        self.write_manifest({"name": "example-cli"})
+        result = run_guards(self.root)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
 
     def test_benign_scripts_pass(self):
         self.write_manifest(

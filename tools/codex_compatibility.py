@@ -241,6 +241,25 @@ def check_workflow_contracts(errors: list[str]) -> None:
     if "Discover portal skills" not in job_search or "Do not guess flags" not in job_search:
         errors.append("job-search skill: portal discovery contract is missing")
 
+    add_template = read_text(ROOT / ".agents" / "skills" / "add-document-template" / "SKILL.md")
+    required_add_template_phrases = [
+        "Switch Mode",
+        "parent folder name exactly",
+        "If more than one manifest matches",
+        "Verify `template.tex` exists",
+        "Do not re-run registration",
+        "`--use default` removes the managed block",
+        "Exactly one managed block",
+        "If activation was reached from Switch Mode",
+        "_compile_test.fls",
+        "_compile_test.fdb_latexmk",
+        "_compile_test.synctex.gz",
+        "_compile_test.*",
+    ]
+    for phrase in required_add_template_phrases:
+        if phrase not in add_template:
+            errors.append(f"add-document-template skill: missing upstream parity contract {phrase!r}")
+
 
 def check_gitignore(errors: list[str]) -> None:
     rules = {line.strip() for line in read_text(ROOT / ".gitignore").splitlines()}

@@ -80,6 +80,25 @@ class CodexWorkflowContractTests(unittest.TestCase):
         ]:
             self.assertIn(phrase, text)
 
+    def test_add_document_template_preserves_upstream_switch_and_cleanup(self):
+        text = skill_text("add-document-template")
+        for phrase in [
+            "Switch Mode",
+            "parent folder name exactly",
+            "If more than one manifest matches",
+            "Verify `template.tex` exists",
+            "Do not re-run registration",
+            "`--use default` removes the managed block",
+            "Exactly one managed block",
+            "If activation was reached from Switch Mode",
+            "_compile_test.fls",
+            "_compile_test.fdb_latexmk",
+            "_compile_test.synctex.gz",
+            "any other",
+            "_compile_test.*",
+        ]:
+            self.assertIn(phrase, text)
+
     def test_outcome_interview_upskill_and_reset_contracts(self):
         self.assertIn("do not overwrite", skill_text("application-outcome").lower())
         self.assertIn("what was actually submitted", skill_text("application-outcome"))

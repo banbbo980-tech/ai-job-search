@@ -11,9 +11,39 @@ ATS requirements.
 ## Arguments
 
 - `--list` lists registered templates.
-- `--use <name>` activates a registered template.
+- `--use <name>` runs Switch Mode, resolves a registered template's metadata,
+  then activates it without re-running registration steps.
 - `--use default` deactivates a custom template.
 - A file or directory path starts registration.
+
+## Listing and Switch Mode
+
+For `--list`, read `templates/**/TEMPLATE.md` and show name, type, engine, fonts,
+page limit, and active status. A template is active when the matching
+job-application-core template reference contains an `ACTIVE-TEMPLATE` managed
+block naming it. If no custom templates exist, say so and explain that
+`$add-document-template` registers one.
+
+For `--use <name>`:
+
+1. If `<name>` is `default`, skip template resolution and continue to activation
+   with `default` as the target.
+2. Find `templates/**/TEMPLATE.md` manifests whose parent folder name exactly
+   matches `<name>`.
+3. If none match, stop and say the template is not registered. Suggest
+   `$add-document-template --list`.
+4. If more than one manifest matches, stop, list the matching manifest paths,
+   and ask the user to rename one template. Activation must be unambiguous.
+5. Read the matching `TEMPLATE.md` and extract type, engine, page limit, and the
+   full font summary line.
+6. Verify `template.tex` exists beside the manifest. If it is missing, stop
+   because registration is incomplete.
+7. Derive the template kind from the manifest path:
+   `templates/cv/<name>/TEMPLATE.md` means CV, and
+   `templates/cover_letters/<name>/TEMPLATE.md` means cover letter.
+8. Continue to activation using the resolved metadata, template skeleton path,
+   and manifest path. Do not re-run registration, storage, or compile-test
+   steps when switching an already-registered template.
 
 ## Registration Workflow
 
@@ -37,17 +67,39 @@ ATS requirements.
      rules, known pitfalls, and validation command.
 6. Run a mandatory compile test. If LaTeX is unavailable locally, report the
    environment block and do not mark the template fully verified.
-7. Activate by adding or replacing a managed active-template block in:
+7. Delete every test-compilation scratch file and output after the compile
+   attempt: `_compile_test.tex`, `_compile_test.pdf`, `_compile_test.aux`,
+   `_compile_test.log`, `_compile_test.out`, `_compile_test.fls`,
+   `_compile_test.fdb_latexmk`, `_compile_test.synctex.gz`, and any other
+   `_compile_test.*` byproduct.
+8. Activate by adding or replacing a managed active-template block in:
    - `../job-application-core/references/05-cv-templates.md`, or
    - `../job-application-core/references/06-cover-letter-templates.md`.
-8. Confirm the active template and the compile status.
+9. Confirm the active template and the compile status.
 
-## Listing and Activation
+## Activation
 
-For `--list`, read `templates/**/TEMPLATE.md` and show name, type, engine, fonts,
-page limit, and active status.
+Activation wires the template into `$job-apply` by adding a managed
+`ACTIVE-TEMPLATE` block near the top of the relevant shared reference:
 
-For `--use`, verify the manifest exists before changing active-template blocks.
+- `../job-application-core/references/05-cv-templates.md` for CVs.
+- `../job-application-core/references/06-cover-letter-templates.md` for cover
+  letters.
+
+If activation was reached from Switch Mode, use the metadata resolved from
+`TEMPLATE.md`. If activation was reached after registering a new template, use
+the metadata collected and verified during registration.
+
+Activation rules:
+
+- Exactly one managed block per reference file.
+- Replace the complete block between `BEGIN ACTIVE-TEMPLATE` and
+  `END ACTIVE-TEMPLATE`; never stack blocks.
+- `--use default` removes the managed block entirely and restores stock
+  guidance.
+- Do not modify text outside the managed markers.
+- Include the skeleton path, manifest path, compile engine, font summary, page
+  limit, and unchanged output-file convention in the block.
 
 ## Rules
 
@@ -55,3 +107,4 @@ For `--use`, verify the manifest exists before changing active-template blocks.
 - Preserve exact page-limit and ATS expectations.
 - Do not activate a template that cannot compile unless the user accepts the
   blocked local verification status explicitly.
+- Do not leave `_compile_test.*` files in the repository or template folder.
