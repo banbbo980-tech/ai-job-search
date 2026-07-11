@@ -12,6 +12,7 @@ checks focus on active Codex surfaces: AGENTS.md and the new workflow skills.
 from __future__ import annotations
 
 import re
+import json
 import sys
 from pathlib import Path
 
@@ -35,6 +36,7 @@ REQUIRED_WORKFLOW_SKILLS = [
     "add-document-template",
     "add-job-portal",
     "reset-job-profile",
+    "sync-upstream",
 ]
 
 CORE_REFERENCES = [
@@ -108,7 +110,9 @@ def check_agents(errors: list[str]) -> None:
         "$application-outcome",
         "$upskill-analysis",
         "$reset-job-profile",
+        "$sync-upstream",
         "Never invent",
+        "Urdu",
         "pdftotext",
         "lualatex",
         "xelatex",
@@ -116,6 +120,46 @@ def check_agents(errors: list[str]) -> None:
     ]:
         if phrase not in text:
             errors.append(f"AGENTS.md: missing required guidance phrase {phrase!r}")
+
+
+def check_upstream_sync_surface(errors: list[str]) -> None:
+    docs = [
+        "docs/UPSTREAM_SYNC_POLICY.md",
+        "docs/UPSTREAM_UPDATE_GUIDE.md",
+        "docs/CODEX_PRODUCTION_CHECKLIST.md",
+        "docs/upstream-state.json",
+        "tools/check_upstream_updates.py",
+    ]
+    for relpath in docs:
+        path = ROOT / relpath
+        if not path.is_file():
+            errors.append(f"{relpath} is missing")
+
+    state_path = ROOT / "docs" / "upstream-state.json"
+    if state_path.is_file():
+        try:
+            state = json.loads(read_text(state_path))
+        except json.JSONDecodeError as exc:
+            errors.append(f"docs/upstream-state.json: invalid JSON: {exc}")
+        else:
+            required = {
+                "schema_version",
+                "official_repository_url",
+                "last_integrated_upstream_commit",
+                "integration_date",
+                "codex_branch",
+                "parity_test_status",
+                "migration_report_path",
+            }
+            missing = required - set(state)
+            if missing:
+                errors.append(f"docs/upstream-state.json: missing fields {sorted(missing)}")
+            if state.get("official_repository_url") != "https://github.com/MadsLorentzen/ai-job-search":
+                errors.append("docs/upstream-state.json: official_repository_url is incorrect")
+            if not re.match(r"^[0-9a-f]{40}$", str(state.get("last_integrated_upstream_commit", "")), re.I):
+                errors.append("docs/upstream-state.json: last_integrated_upstream_commit must be a full hash")
+            if state.get("codex_branch") != "codex-migration":
+                errors.append("docs/upstream-state.json: codex_branch must be codex-migration")
 
 
 def check_skills(errors: list[str]) -> None:
@@ -208,6 +252,7 @@ def check_gitignore(errors: list[str]) -> None:
 def main() -> int:
     errors: list[str] = []
     check_agents(errors)
+    check_upstream_sync_surface(errors)
     check_skills(errors)
     check_core_references(errors)
     check_workflow_contracts(errors)
