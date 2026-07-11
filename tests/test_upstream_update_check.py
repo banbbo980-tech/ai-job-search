@@ -145,6 +145,24 @@ class UpdateCheckTests(UpstreamFixture):
         self.assertEqual(report["commit_count"], 1)
         self.assertEqual(report["changed_files"][0]["paths"], ["README.md"])
 
+    def test_sync_update_branch_is_allowed(self):
+        _, work, _ = self.make_fixture()
+        git(work, "checkout", "-b", "sync/upstream-2026-07-12-abcdef0")
+
+        result = self.run_checker(work)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        report = json.loads(result.stdout)
+        self.assertEqual(report["branch"], "sync/upstream-2026-07-12-abcdef0")
+
+    def test_non_sync_feature_branch_fails_safely(self):
+        _, work, _ = self.make_fixture()
+        git(work, "checkout", "-b", "feature/random")
+
+        result = self.run_checker(work)
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("expected stable Codex branch", result.stdout)
+        self.assertIn("sync/upstream-YYYY-MM-DD", result.stdout)
+
     def test_new_claude_command_is_highlighted(self):
         official, work, _ = self.make_fixture()
         self.official_commit(official, ".claude/commands/new.md", "# /new\n", "new claude command")

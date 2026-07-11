@@ -22,6 +22,7 @@ DEFAULT_STATE = ROOT / "docs" / "upstream-state.json"
 UPSTREAM_REMOTE = "upstream"
 UPSTREAM_BRANCH = "master"
 HEX_RE = re.compile(r"^[0-9a-f]{40}$", re.I)
+SYNC_BRANCH_RE = re.compile(r"^sync/upstream-\d{4}-\d{2}-\d{2}-[0-9a-f]{7,40}$", re.I)
 
 
 class SafeError(RuntimeError):
@@ -86,8 +87,11 @@ def ensure_clean(repo: Path) -> None:
 
 def ensure_branch(repo: Path, expected_branch: str) -> str:
     branch = git(repo, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
-    if branch != expected_branch:
-        raise SafeError(f"current branch is {branch!r}; expected stable Codex branch {expected_branch!r}")
+    if branch != expected_branch and not SYNC_BRANCH_RE.match(branch):
+        raise SafeError(
+            f"current branch is {branch!r}; expected stable Codex branch {expected_branch!r} "
+            "or a sync/upstream-YYYY-MM-DD-<sha> update branch"
+        )
     return branch
 
 
