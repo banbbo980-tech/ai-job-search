@@ -48,6 +48,12 @@ Use $interview-prep for my interview at <company>.
 Use $upskill-analysis to identify my skill gaps.
 ```
 
+9. To check for official project updates:
+
+```text
+Use $sync-upstream to check the official repository for updates.
+```
+
 ## What to Put in documents/
 
 - `documents/cv/`: your most complete CV or resume.
@@ -107,6 +113,28 @@ Do not commit:
 - `salary_data.json`.
 - Scraper state.
 - Upskill reports.
+
+## GitHub And Branches
+
+`upstream` means the official project by Mads Lorentzen. It is the source this
+Codex version watches for future changes.
+
+`origin` means your GitHub fork after it is created. It is the place your
+Codex-native branch can be pushed.
+
+Use `codex-migration` for normal Codex work. Official updates should first go
+into a temporary branch named like `sync/upstream-2026-07-11-c134eef`, then be
+tested before they are merged back.
+
+Check for updates with:
+
+```bash
+python tools/check_upstream_updates.py
+```
+
+Do not blindly merge official updates into `codex-migration`, because the
+official project can contain Claude-specific commands or instructions that must
+be converted into Codex skills.
 
 ## Troubleshooting
 

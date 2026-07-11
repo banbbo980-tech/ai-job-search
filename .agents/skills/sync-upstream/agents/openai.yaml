@@ -1,0 +1,4 @@
+interface:
+  display_name: "Sync Upstream"
+  short_description: "Safely import official project updates"
+  default_prompt: "Use $sync-upstream to check official repository updates and prepare a verified Codex sync."

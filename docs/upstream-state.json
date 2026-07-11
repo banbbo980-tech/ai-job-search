@@ -1,0 +1,9 @@
+{
+  "schema_version": 1,
+  "official_repository_url": "https://github.com/MadsLorentzen/ai-job-search",
+  "last_integrated_upstream_commit": "c134eef5530e5431707ab553582a452be2306041",
+  "integration_date": "2026-07-11",
+  "codex_branch": "codex-migration",
+  "parity_test_status": "passed-local-checks-with-environment-blocks",
+  "migration_report_path": "docs/CODEX_TEST_REPORT.md"
+}

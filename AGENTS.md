@@ -29,6 +29,15 @@ record outcomes, and plan upskilling.
 - Preserve attribution to the original independent MIT-licensed project. Do not
   imply OpenAI created or endorses it.
 
+## Language Preference
+
+- The user may communicate in Urdu, Hindi, or Roman Urdu/Hindi.
+- Always respond to the user in clear English unless the user explicitly asks for
+  another language.
+- Keep explanations understandable for a non-technical user.
+- Do not translate code, filenames, commands, technical identifiers, or
+  job-application documents unless requested.
+
 ## Codex Skills
 
 Use these project skills from `.agents/skills/`:
@@ -44,6 +53,8 @@ Use these project skills from `.agents/skills/`:
 - `$add-document-template` for custom LaTeX templates.
 - `$add-job-portal` for custom portal search skills.
 - `$reset-job-profile` for confirmation-gated resets.
+- `$sync-upstream` for checking official repository updates and preparing a
+  verified Codex-native sync branch.
 - `$job-application-core` for shared profile, writing, evaluation, template, and
   search-query references.
 
@@ -74,6 +85,7 @@ python -m unittest discover -s tests -t . -v
 python tools/lint_skills.py
 python tools/security_guards.py
 python tools/codex_compatibility.py
+python tools/check_upstream_updates.py --no-fetch
 ```
 
 For portal CLIs, use the project-standard Bun checks when Bun is installed:
@@ -125,3 +137,8 @@ and apply the same criteria without inventing facts.
 - Do not remove `CLAUDE.md` or `.claude/` until Codex parity tests pass.
 - Do not install global software or change system-wide configuration without user
   approval.
+- Keep `upstream` pointed at the official repository and `origin` pointed only at
+  the user's fork after it is configured. Never push to `upstream`.
+- Never blindly merge official updates into `codex-migration`. Use
+  `$sync-upstream` and a temporary `sync/upstream-<date>-<short-sha>` branch.
+- Run `python tools/security_guards.py` before any push.
