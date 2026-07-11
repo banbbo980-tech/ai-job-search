@@ -68,8 +68,10 @@ As of the current local check:
 - `lualatex` is not on PATH.
 - `xelatex` is not on PATH.
 - `pdftotext` is not on PATH.
-- `winget` is available at
-  `C:\Users\EHSAN COMPUTERS\AppData\Local\Microsoft\WindowsApps\winget.exe`.
+- `winget` has a WindowsApps shim at
+  `C:\Users\EHSAN COMPUTERS\AppData\Local\Microsoft\WindowsApps\winget.exe`,
+  but `winget --version` failed locally with a Windows logon-session error, so
+  it is not verified usable from this shell.
 - `scoop` and `choco` are not on PATH.
 
 Blocked checks must stay marked blocked until the tools are installed and the
@@ -81,7 +83,7 @@ Do not install anything here without user approval.
 
 | Software | Why needed | Recommended install method | Source | Approximate disk use | Restart | Verify |
 |---|---|---|---|---|---|---|
-| GitHub CLI (`gh`) | Create/check the fork, authenticate safely, configure `origin`, and push. | `winget install --id GitHub.cli -e` or official MSI. | https://github.com/cli/cli | Usually under 100 MB. | New terminal usually enough. | `gh --version`, `gh auth status` |
+| GitHub CLI (`gh`) | Create/check the fork, authenticate safely, configure `origin`, and push. | Official MSI, or `winget install --id GitHub.cli -e` after `winget --version` works. | https://github.com/cli/cli | Usually under 100 MB. | New terminal usually enough. | `gh --version`, `gh auth status` |
 | Bun | Official portal CLI install, typecheck, and test runner. | Official per-user PowerShell installer: `powershell -c "irm bun.sh/install.ps1|iex"`. | https://bun.sh/docs/installation | Usually under 200 MB before dependencies. Portal dependencies add more. | New terminal required after PATH update. | `bun --version`, `bun --revision` |
 | MiKTeX | Provides `lualatex` and `xelatex` for CV and cover-letter PDFs. | Basic MiKTeX Installer, private per-user install, package install set to `Ask me first`. | https://miktex.org/howto/install-miktex | Basic installer is small; installed packages can grow from hundreds of MB to several GB. | Usually no reboot; new terminal may be needed. | `lualatex --version`, `xelatex --version` |
 | Poppler for Windows | Provides `pdftotext` for ATS extraction and reading-order checks. | Portable ZIP from the Poppler Windows release, then add its `Library\bin` folder to the user PATH. | https://github.com/oschwartz10612/poppler-windows/releases | Usually tens to hundreds of MB extracted. | New terminal required after PATH update. | `pdftotext -v` |
