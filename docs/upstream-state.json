@@ -1,9 +1,9 @@
 {
   "schema_version": 1,
   "official_repository_url": "https://github.com/MadsLorentzen/ai-job-search",
-  "last_integrated_upstream_commit": "855b6725f34b52aa869a6d7e5fe39103dc56485f",
+  "last_integrated_upstream_commit": "99cf1000d69b53c39a247158bf462f0ad3d7eed2",
   "integration_date": "2026-07-12",
   "codex_branch": "codex-migration",
-  "parity_test_status": "passed-production-verification",
-  "migration_report_path": "docs/upstream-updates/2026-07-12_855b672.md"
+  "parity_test_status": "pending-sync-branch-verification",
+  "migration_report_path": "docs/upstream-updates/2026-07-12_99cf100.md"
 }
