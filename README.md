@@ -23,6 +23,26 @@ endorsed by, sponsored by, or maintained by OpenAI, Anthropic, or any job portal
 > sponsorship program**. Any claim about an official AI Job Search coin or token
 > is fraudulent or unaffiliated.
 
+## Does It Actually Work?
+
+Mads Lorentzen, the original maintainer, is a geophysicist by training. When
+his position was cut in late 2025, he built this framework to run his own job
+search. He used the original scrape, apply, and interview workflow weekly on
+his own career, and was upfront about that process with employers.
+
+Sixty-nine tailored applications, twenty first interviews, and one signed
+contract later, he started as an AI engineer in June 2026. People kept asking
+whether the framework actually works. It got him hired; this fork keeps that
+local-first workflow available through Codex-compatible skills.
+
+*The longer version, including the full application funnel, is on
+[LinkedIn](https://www.linkedin.com/in/mads-lorentzen/).*
+
+<p align="center">
+  <i>Did this save you a Sunday of cover-letter writing? Consider a coffee.<br>
+  Did it land you the job? Maybe two.</i>
+</p>
+
 ## What It Does
 
 The workflow keeps your private career material on your machine and helps you
