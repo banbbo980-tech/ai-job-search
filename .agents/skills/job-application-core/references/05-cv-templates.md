@@ -96,6 +96,13 @@ Two related patterns are fine and should be kept:
 - `\vspace{1pt}` immediately after `\section{...}` (between section heading and first item) - this is between the heading and the list, not between list items.
 - `\vspace{3pt}` between top-level `\cventry` blocks in Professional Experience or Education - this gives breathing room between roles and renders consistently.
 
+Do not wrap `\cventry` blocks in an outer `itemize` list, and do not put a
+standard `itemize` environment inside a `\cventry` body. `moderncv` already lays
+out `\cventry` with its own column geometry, and nested list indentation can push
+achievement bullets off the left edge of the rendered PDF on MiKTeX/LuaLaTeX.
+Use `\cvlistitem{...}` for achievement bullets inside the sixth `\cventry`
+argument.
+
 ## Section-by-Section Tailoring
 
 ### Profile Statement / Elevator Pitch (Best Practice)
@@ -161,7 +168,7 @@ After writing the CV and before presenting to the user, always compile and visua
 Add `\needspace{5\baselineskip}` immediately before the problematic `\cventry`:
 ```latex
 \needspace{5\baselineskip}
-\item{\cventry{YEAR--YEAR}{Role Title}{Organization}{Location}{}{...}}
+\cventry{YEAR--YEAR}{Role Title}{Organization}{Location}{}{...}
 ```
 Include `\usepackage{needspace}` in the preamble.
 
