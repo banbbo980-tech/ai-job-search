@@ -53,6 +53,15 @@ class LatexTemplateContractTests(unittest.TestCase):
                 for block in self.cventry_blocks(text):
                     self.assertNotIn(r"\begin{itemize}", block)
 
+    def test_example_cv_uses_ats_safe_moderncv_symbols(self):
+        """Moderncv icons can extract as private-use glyphs in ATS text."""
+        text = (ROOT / "cv" / "main_example.tex").read_text(encoding="utf-8")
+
+        self.assertIn(r"\renewcommand*{\mobilephonesymbol}{Phone:~}", text)
+        self.assertIn(r"\renewcommand*{\emailsymbol}{Email:~}", text)
+        self.assertIn(r"\renewcommand*{\labelitemi}{\strut\textcolor{color1}{-}}", text)
+        self.assertIn(r"\renewcommand*{\listitemsymbol}{\labelitemi~}", text)
+
 
 if __name__ == "__main__":
     unittest.main()
