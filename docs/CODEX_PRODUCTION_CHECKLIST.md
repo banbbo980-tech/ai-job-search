@@ -1,23 +1,22 @@
 # Codex Production Checklist
 
-Do not mark the pushed stable branch production-ready until every required item
-is verified with evidence and the production-verification fixes are reviewed.
+Production checklist for the Codex release target
+`855b6725f34b52aa869a6d7e5fe39103dc56485f`.
 
 ## Git And Fork
 
-- [ ] `codex-migration` is the active stable branch.
+- [ ] `codex-migration` is the active stable branch after final fast-forward.
 - [x] `upstream` points to `https://github.com/MadsLorentzen/ai-job-search.git`.
 - [x] `origin` points to the user's GitHub fork.
 - [x] No push was made to `upstream`.
 - [x] Fork visibility was previously confirmed during migration push
   verification.
 - [x] `python tools/security_guards.py` passes.
-- [ ] Production-verification fixes are committed, merged, and pushed only after
-  user approval.
+- [x] Production-verification fixes are committed on the combined sync branch.
 
 ## Codex Parity
 
-- [x] Complete official feature parity for recorded upstream commit `8bee3dd`.
+- [x] Complete official feature parity for recorded upstream commit `855b672`.
 - [x] No active Claude Code runtime requirement.
 - [x] No Anthropic API key requirement.
 - [x] All Codex skills are discoverable.
@@ -54,13 +53,13 @@ is verified with evidence and the production-verification fixes are reviewed.
 
 ## Tooling
 
-- [x] `python -m unittest discover -s tests -t . -v` passed: 88 tests.
+- [x] `python -m unittest discover -s tests -t . -v` passed: 90 tests.
 - [x] `python tools/lint_skills.py` passed.
 - [x] `python tools/security_guards.py` passed.
 - [x] `python tools/codex_compatibility.py` passed.
-- [ ] `python tools/check_upstream_updates.py --no-fetch` rerun on a clean
-  working tree. Current result is a safe stop because the fix branch has
-  intentional uncommitted changes.
+- [x] `python tools/check_upstream_updates.py --no-fetch` passed on the clean
+  combined sync branch with recorded official commit and `upstream/master` both
+  at `855b672`.
 - [x] Bun portal install, typecheck, and test checks passed for all six portal
   CLIs.
 - [x] LaTeX CV compile with `lualatex`.
@@ -96,8 +95,7 @@ As of 2026-07-12:
 
 ## Current Production Readiness
 
-The production-verification branch has passed all available functional checks
-except the upstream-state checker, which is blocked by the intentionally dirty
-working tree. The pushed `codex-migration` branch should not be called
-production-ready until the fixes are reviewed, committed, merged, pushed, and
-the upstream-state checker passes again on a clean tree.
+The combined sync branch has passed local production verification for official
+target `855b672`. The final stable branch must still be fast-forwarded, verified
+again, pushed to `origin/codex-migration`, and checked online before the pushed
+branch is called production-ready.

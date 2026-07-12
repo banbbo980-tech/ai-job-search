@@ -1,10 +1,10 @@
 # Codex Test Report
 
-Latest local verification for the Codex production-verification branch.
+Latest local verification for the Codex 855b672 production release candidate.
 
-Branch: `fix/production-verification-2026-07-12`
+Branch: `sync/upstream-2026-07-12-855b672`
 Base stable commit: `971d0b9f3b9f3447ae472d5466c0c7bdfed2d59d`
-Recorded official upstream commit: `8bee3ddb9731b715908dbde288f457e541b3d7dc`
+Recorded official upstream commit: `855b6725f34b52aa869a6d7e5fe39103dc56485f`
 Verification date: 2026-07-12
 
 ## Installed Tooling
@@ -24,15 +24,15 @@ test required the MiKTeX package `titlesec`, which was installed with
 
 | Command | Result |
 |---|---|
-| `python -m unittest discover -s tests -t . -v` | Passed: 88 tests in 67.053s |
+| `python -m unittest discover -s tests -t . -v` | Passed: 90 tests in 64.987s |
 | `python tools/lint_skills.py` | Passed: `lint_skills: OK (22 skills, 9 commands, settings.json)` |
 | `python tools/security_guards.py` | Passed: `security_guards: OK (permissions allowlist, gitignore rules, package manifests)` |
 | `python tools/codex_compatibility.py` | Passed: `codex_compatibility: OK (13 workflow skills, 8 shared references, AGENTS.md)` |
-| `python tools/check_upstream_updates.py --no-fetch` | Safe stop: working tree is intentionally dirty with uncommitted production-verification fixes |
+| `python tools/check_upstream_updates.py --no-fetch` | Passed: recorded official commit and `upstream/master` both `855b6725f34b52aa869a6d7e5fe39103dc56485f` |
+| `git diff --check` | Passed |
 
-`check_upstream_updates.py --no-fetch` should be rerun after the fix branch is
-committed or otherwise made clean. The recorded upstream state still identifies
-`8bee3dd` as the integrated official commit.
+The Python suite includes the upstream README asset guard and the LaTeX clipping
+contract test.
 
 ## Bun Portal Checks
 
@@ -107,11 +107,10 @@ workflow.
 
 ## Current Limitations
 
-- The stable `codex-migration` branch is not yet updated with the production
-  fixes. Production readiness is proven for the uncommitted
-  `fix/production-verification-2026-07-12` working tree, not yet for the pushed
-  stable branch.
-- `python tools/check_upstream_updates.py --no-fetch` must be rerun after the
-  fix branch is clean.
+- This report records verification on the combined sync branch before the final
+  fast-forward merge and push to `codex-migration`.
+- The release target is frozen at official commit `855b672`; later upstream
+  commits, if any are published after the target freeze, belong to the next sync
+  cycle.
 - MiKTeX still reports that updates have not been checked because repository
   host resolution failed during the package-database refresh attempt.
