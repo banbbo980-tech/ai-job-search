@@ -12,20 +12,30 @@ class VerificationError(Exception):
     """Raised when a generated PDF does not satisfy its checks."""
 
 
+def decode_output(output):
+    if output is None:
+        return ""
+    if isinstance(output, bytes):
+        return output.decode("utf-8", errors="replace")
+    return str(output)
+
+
 def run_tool(command):
     try:
-        return subprocess.run(
+        result = subprocess.run(
             command,
             check=True,
             capture_output=True,
-            text=True,
-        ).stdout
+        )
+        return decode_output(result.stdout)
     except FileNotFoundError as exc:
         raise VerificationError(
             f"required command '{command[0]}' was not found; install poppler-utils"
         ) from exc
     except subprocess.CalledProcessError as exc:
-        detail = (exc.stderr or "").strip() or (exc.stdout or "").strip()
+        stderr = decode_output(exc.stderr)
+        stdout = decode_output(exc.stdout)
+        detail = stderr.strip() or stdout.strip()
         detail = detail or "command failed"
         raise VerificationError(f"{command[0]} could not read the PDF: {detail}") from exc
 

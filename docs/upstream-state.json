@@ -4,6 +4,6 @@
   "last_integrated_upstream_commit": "4128ca03189e19f9e2e54a5be63653f6065dbb87",
   "integration_date": "2026-07-14",
   "codex_branch": "codex-migration",
-  "parity_test_status": "pending-sync-branch-verification",
+  "parity_test_status": "passed-sync-branch-verification",
   "migration_report_path": "docs/upstream-updates/2026-07-14_4128ca0.md"
 }
