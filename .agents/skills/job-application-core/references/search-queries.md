@@ -2,11 +2,24 @@
 
 <!-- SETUP: Customize these queries based on your skills, target roles, and location -->
 
+## Installed Portal CLIs
+
+`$job-search` discovers every portal skill under `.agents/skills/*/SKILL.md`
+and runs its CLI first. Shipped country-agnostic CLIs include
+`linkedin-search` and `freehire-search`; Danish demos and any skill added with
+`$add-job-portal` are included the same way. You do not need a matching `site:`
+line below for those CLIs to run.
+
+The `site:` query templates in this file are the web-search fallback for
+portals without a CLI, company career pages, or cases where a CLI is unavailable
+or fails.
+
 ## Search Sites
 
 Primary (your market's job boards - scaffold one with `$add-job-portal`):
 - **[YOUR_JOB_BOARD]** - your market's largest general job board
-- **linkedin.com/jobs** - LinkedIn job listings (filter: [YOUR_COUNTRY] / [YOUR_CITY])
+- **linkedin.com/jobs** - LinkedIn job listings (filter: [YOUR_COUNTRY] / [YOUR_CITY]); also covered by `linkedin-search` CLI
+- **freehire.co** - international and remote roles; also covered by `freehire-search` CLI
 - **[YOUR_INDUSTRY_JOB_BOARD]** - a niche/industry board for your field (optional)
 - **[YOUR_ADDITIONAL_JOB_BOARD]** - another major board for your market (optional)
 

@@ -58,7 +58,10 @@ cli/tests/helpers.ts
 9. If Bun is unavailable locally, report the environment block and leave clear
    commands for the user or CI to run.
 10. Register by ensuring `$job-search` can discover the new skill through its
-    `SKILL.md`; do not hard-code the portal in `$job-search`.
+    `SKILL.md`; do not hard-code the portal in `$job-search`. Ask whether the
+    user also wants WebSearch `site:` fallback placeholders for the board added
+    to `../job-application-core/references/search-queries.md`; the CLI itself
+    does not require that fallback entry.
 
 ## Rules
 

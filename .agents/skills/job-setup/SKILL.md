@@ -57,7 +57,12 @@ legacy synchronization during the transition.
    unless creating a blank template or replacing placeholder-only content.
 10. Fill remaining gaps through concise follow-up questions: career goals,
     target roles, location constraints, deal-breakers, writing style, STAR
-    examples, and search configuration.
+    examples, and search configuration. When asking about portals, explain that
+    the project ships country-agnostic `linkedin-search` and `freehire-search`
+    CLIs plus Danish portal examples, and that `$job-search` auto-discovers
+    installed portal skills under `.agents/skills/`. If the user needs another
+    local board, suggest `$add-job-portal`; web `site:` queries remain the
+    fallback for portals without a CLI.
 11. Update `references/search-queries.md` from the final search configuration.
 12. Summarize files changed, unresolved conflicts, gaps left for the user, and
     suggested next skills: `$job-search` and `$job-apply`.
