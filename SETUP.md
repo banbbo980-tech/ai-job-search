@@ -34,6 +34,9 @@ Windows PowerShell:
 powershell -ExecutionPolicy Bypass -c "irm https://bun.sh/install.ps1 | iex"
 ```
 
+If you prefer a Windows package manager, `winget install Oven-sh.Bun` also
+works.
+
 macOS/Linux:
 
 ```bash
@@ -72,6 +75,27 @@ Install a LaTeX distribution that includes `lualatex` and `xelatex`.
 The stock CV compiles with `lualatex`. The stock cover letter compiles with
 `xelatex` because `cover.cls` uses custom fonts.
 
+Full TeX distributions usually work out of the box. Minimal distributions such
+as TinyTeX or BasicTeX need the stock template packages installed first:
+
+```bash
+tlmgr install \
+  moderncv fontawesome5 fontawesome6 academicons import luatexbase pgf \
+  titlesec textpos xltxtra xunicode cite realscripts needspace
+```
+
+On macOS, a user-level TinyTeX install avoids a system-wide installer:
+
+```bash
+curl -fsSL https://yihui.org/tinytex/install-bin-unix.sh -o /tmp/tinytex-install-bin-unix.sh
+sh /tmp/tinytex-install-bin-unix.sh /tmp --no-path
+export PATH="$HOME/Library/TinyTeX/bin/universal-darwin:$PATH"
+```
+
+For BasicTeX/MacTeX, make sure the TeX binary directory is on `PATH` first, for
+example via `/Library/TeX/texbin`, then run the same `tlmgr install ...`
+command.
+
 Smoke tests:
 
 ```bash
@@ -85,7 +109,8 @@ cd ../cover_letters && xelatex -interaction=nonstopmode -halt-on-error cover_exa
 
 - macOS: `brew install poppler`
 - Debian/Ubuntu: `sudo apt install poppler-utils`
-- Windows: install Poppler through your preferred package manager
+- Windows: install Poppler through your preferred package manager, such as
+  Chocolatey with `choco install poppler`
 
 Check:
 

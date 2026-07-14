@@ -23,6 +23,17 @@ UPSTREAM_REMOTE = "upstream"
 UPSTREAM_BRANCH = "master"
 HEX_RE = re.compile(r"^[0-9a-f]{40}$", re.I)
 SYNC_BRANCH_RE = re.compile(r"^sync/upstream-\d{4}-\d{2}-\d{2}-[0-9a-f]{7,40}$", re.I)
+FRAMEWORK_SKILL_DIR = ".claude/skills/job-application-assistant"
+FRAMEWORK_FILES = [
+    "01-candidate-profile.md",
+    "02-behavioral-profile.md",
+    "03-writing-style.md",
+    "04-job-evaluation.md",
+    "05-cv-templates.md",
+    "06-cover-letter-templates.md",
+    "07-interview-prep.md",
+    "SKILL.md",
+]
 
 
 class SafeError(RuntimeError):
@@ -165,6 +176,55 @@ def parse_name_status(raw: str) -> list[dict[str, Any]]:
     return changes
 
 
+def get_framework_version_from_text(text: str) -> str | None:
+    if not text.startswith("---\n"):
+        return None
+    end = text.find("\n---", 4)
+    if end == -1:
+        return None
+    for line in text[4:end].splitlines():
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        if key.strip() == "framework_version":
+            return value.strip().strip('"').strip("'")
+    return None
+
+
+def parse_semver(version: str) -> tuple[int, int, int]:
+    match = re.match(r"^v?(\d+)\.(\d+)\.(\d+)", version)
+    if not match:
+        return (0, 0, 0)
+    return tuple(int(part) for part in match.groups())
+
+
+def compare_framework_versions(repo: Path, upstream_ref: str) -> list[dict[str, str | None]]:
+    updates: list[dict[str, str | None]] = []
+    for filename in FRAMEWORK_FILES:
+        rel_path = f"{FRAMEWORK_SKILL_DIR}/{filename}"
+        local_path = repo / rel_path
+        local_version = None
+        if local_path.exists():
+            local_version = get_framework_version_from_text(local_path.read_text(encoding="utf-8"))
+
+        upstream_result = git(repo, "show", f"{upstream_ref}:{rel_path}", check=False)
+        if upstream_result.returncode != 0:
+            continue
+        upstream_version = get_framework_version_from_text(upstream_result.stdout)
+        if not upstream_version:
+            continue
+
+        if not local_version or parse_semver(upstream_version) > parse_semver(local_version):
+            updates.append(
+                {
+                    "path": rel_path,
+                    "local": local_version,
+                    "upstream": upstream_version,
+                }
+            )
+    return updates
+
+
 def check_updates(repo: Path, state_path: Path, fetch: bool = True) -> dict[str, Any]:
     repo = repo.resolve()
     state_path = state_path.resolve()
@@ -190,6 +250,7 @@ def check_updates(repo: Path, state_path: Path, fetch: bool = True) -> dict[str,
         commits = git(repo, "log", "--oneline", f"{recorded_commit}..{upstream_ref}").stdout.splitlines()
         raw_changes = git(repo, "diff", "--name-status", recorded_commit, upstream_ref).stdout
         changes = parse_name_status(raw_changes)
+    framework_version_updates = compare_framework_versions(repo, upstream_ref)
 
     short = upstream_commit[:7]
     today = _dt.date.today().isoformat()
@@ -209,6 +270,7 @@ def check_updates(repo: Path, state_path: Path, fetch: bool = True) -> dict[str,
         "commits": commits,
         "changed_files": changes,
         "claude_specific_changes": [change for change in changes if change["claude_specific"]],
+        "framework_version_updates": framework_version_updates,
         "recommended_sync_branch": f"sync/upstream-{today}-{short}" if updates_available else None,
     }
 
@@ -244,6 +306,11 @@ def print_text(report: dict[str, Any]) -> None:
         print("\nClaude-specific changes requiring semantic Codex conversion:")
         for change in report["claude_specific_changes"]:
             print(f"- {' -> '.join(change['paths'])}")
+
+    if report["framework_version_updates"]:
+        print("\nFramework version markers newer upstream:")
+        for update in report["framework_version_updates"]:
+            print(f"- {update['path']}: local {update['local']} < upstream {update['upstream']}")
 
     print("\nNext safe step: create the sync branch, import changes there, convert behavior, test parity, and ask before merging.")
 
