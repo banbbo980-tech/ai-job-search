@@ -219,7 +219,7 @@ def _print_crossref(ref: str) -> None:
     print()
     print(
         "_For personalized-file version stamps (which methodology files changed), "
-        f"run `python tools/check_upstream_updates.py --remote {ref.split('/')[0]}`._"
+        "run `python tools/check_upstream_updates.py --no-fetch`._"
     )
 
 

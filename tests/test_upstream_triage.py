@@ -68,6 +68,13 @@ class UpToDateTests(TriageRepoFixture):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Up to date", result.stdout)
 
+    def test_points_to_state_aware_checker_command(self):
+        self.set_upstream_to_head()
+        result = self.run_triage()
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("check_upstream_updates.py --no-fetch", result.stdout)
+        self.assertNotIn("check_upstream_updates.py --remote", result.stdout)
+
 
 class RelevanceFilterTests(TriageRepoFixture):
     def test_commit_touching_only_removed_files_is_skipped(self):
