@@ -73,6 +73,11 @@ class TestPathRules(unittest.TestCase):
 
 
 class TestAgentSelection(unittest.TestCase):
+    def test_named_codex_opt_out_is_honored(self):
+        body = "User-agent: Codex\nDisallow: /private\n\nUser-agent: *\nAllow: /\n"
+        self.assertFalse(allowed(body, "Codex", "/private"))
+        self.assertTrue(allowed(body, "*", "/private"))
+
     def test_named_claude_user_opt_out_is_honored(self):
         body = "User-agent: Claude-User\nDisallow: /\n\nUser-agent: *\nAllow: /\n"
         self.assertFalse(allowed(body, "Claude-User", "/a"))

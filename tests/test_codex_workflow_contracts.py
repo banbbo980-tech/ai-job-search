@@ -48,11 +48,11 @@ class CodexWorkflowContractTests(unittest.TestCase):
         for phrase in [
             "Discover portal skills",
             "Do not guess flags",
-            "Deduplicate by URL and company+title",
+            "Deduplicate by canonical URL and case-insensitive company+title",
             "If Bun is unavailable",
         ]:
             self.assertIn(phrase, text)
-        self.assertIn("Preserve any fields added by $job-rank", flat)
+        self.assertIn("Preserve fields added by $job-rank", flat)
 
     def test_rank_preserves_scoring_weights_and_vetoes(self):
         text = skill_text("job-rank")
@@ -86,7 +86,7 @@ class CodexWorkflowContractTests(unittest.TestCase):
             "Switch Mode",
             "parent folder name exactly",
             "If more than one manifest matches",
-            "Verify `template.tex` exists",
+            "Verify `template<source-extension>` exists",
             "Do not re-run registration",
             "`--use default` removes the managed block",
             "Exactly one managed block",
@@ -96,6 +96,8 @@ class CodexWorkflowContractTests(unittest.TestCase):
             "_compile_test.synctex.gz",
             "any other",
             "_compile_test.*",
+            "full compile command",
+            "Source extension",
         ]:
             self.assertIn(phrase, text)
 

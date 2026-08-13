@@ -25,12 +25,13 @@ to cover gaps.
    - `outcome.md`
    - earlier `interview_prep_<stage>.md` files when relevant
 3. Read:
-   - `../job-application-core/references/01-candidate-profile.md`
-   - `../job-application-core/references/02-behavioral-profile.md`
+   - Local ignored candidate and behavioral profile files when present.
    - `../job-application-core/references/04-job-evaluation.md`
    - `../job-application-core/references/07-interview-prep.md`
-4. Research the company and interviewers only when allowed and useful. Verify
-   sources before using claims.
+   - `../job-application-core/references/09-web-research.md`
+4. Research the company and interviewers only when allowed and useful. Follow the
+   web-research trust boundary, search independently, and verify sources before
+   using claims. Do not automate people-search pages.
 5. Build a prep pack with:
    - Stage, date, format, interviewer names.
    - Role priorities from the posting.
@@ -48,6 +49,11 @@ to cover gaps.
 
 8. Present the prep pack in chat and offer a mock interview using the roleplay
    protocol from the interview reference.
+9. With confirmation, update the matched tracker row to canonical `interview` and
+   append the stage/date without reopening any final status.
+10. If the user supplies a new factual example during prep, summarize the exact
+    claim and evidence and ask whether to add it to the ignored local candidate or
+    behavioral profile. Never write it into tracked shared references.
 
 ## Rules
 
@@ -56,3 +62,5 @@ to cover gaps.
 - Do not ask questions whose answers are already obvious from verified public
   research.
 - Preserve one prep file per stage so earlier history remains intact.
+- The archive created by `$job-apply` is the source of what the employer saw;
+  never substitute a newer CV or reconstruct a missing posting.

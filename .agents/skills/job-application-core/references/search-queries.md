@@ -14,6 +14,14 @@ The `site:` query templates in this file are the web-search fallback for
 portals without a CLI, company career pages, or cases where a CLI is unavailable
 or fails.
 
+## Language Scope
+
+Create each query category in every professional language recorded in the ignored
+local search preferences. Translate role concepts naturally rather than word for
+word. Apply the Language Gate to explicit job requirements: an undeclared required
+language is excluded, while a possibly higher required level in a declared
+language is flagged for the user's judgment.
+
 ## Search Sites
 
 Primary (your market's job boards - scaffold one with `$add-job-portal`):
@@ -28,7 +36,8 @@ Secondary (company career pages via Google):
 
 ## Query Categories
 
-Queries are grouped by priority. Each query should be combined with your location terms (e.g. your city, region, or metro area) where the site supports it.
+Queries are grouped by priority. Create each category in every configured
+professional language and combine it with location terms where supported.
 
 ### Priority 1: [YOUR_PRIMARY_ROLE_TYPE]
 

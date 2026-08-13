@@ -1,10 +1,43 @@
 ---
-framework_version: 1.0.0
+framework_version: 1.2.2
 ---
 
 # Job Evaluation Framework
 
 <!-- SETUP: Skill match areas and career goals are personalized by running $job-setup -->
+
+## Eligibility Gate - Run Before Scoring
+
+Compare the posting's exact citizenship, permanent-residency, security-clearance,
+visa, sponsorship, permit, start-date, and working-hours conditions with the
+candidate's verified local profile.
+
+| Posting condition | Verdict |
+|-------------------|---------|
+| Explicit citizenship/permanent-residency requirement the candidate does not meet | **FAIL** - quote it and stop before scoring or drafting |
+| Security clearance | **FAIL unless the named scheme is verified as available to the candidate** |
+| Candidate's permit is explicitly accepted, international applicants are welcomed, or sponsorship is offered | **PASS** |
+| Posting is silent | **UNVERIFIED** - check the employer's own role/program eligibility page |
+
+Silence is not permission, and a company-wide international statement does not
+prove a specific stream accepts the candidate. Keep work-permit timing and hour
+limits as a separate recorded condition. Report failures with the source so the
+user can correct incomplete profile data.
+
+## Language Gate - Run Before Scoring
+
+Evaluate explicit job-condition language requirements, not merely the language in
+which the advertisement is written.
+
+| Requirement vs candidate language table | Verdict |
+|-----------------------------------------|---------|
+| Required language is absent | **FAIL** - quote the requirement and stop |
+| Language is present but required level may exceed declared level | **FLAG** - score normally and ask the user to judge |
+| Language and level are supported, or no level is stated | **PASS** |
+
+Compare CEFR, plain-language, and platform proficiency descriptions with judgment.
+When uncertain, prefer a visible `FLAG` over a silent pass. Never upgrade the
+candidate's level to satisfy a posting.
 
 ## Scoring Dimensions
 

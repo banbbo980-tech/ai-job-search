@@ -1,0 +1,4 @@
+interface:
+  display_name: "HTML Report"
+  short_description: "Build a private application dashboard"
+  default_prompt: "Use $html-report to generate my private local job-search dashboard."

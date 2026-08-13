@@ -1,6 +1,10 @@
 # Documents Folder
 
-This folder holds your actual career documents. The `$job-setup` skill reads everything here and uses it to populate the Codex profile references under `.agents/skills/job-application-core/references/`. It is safe to re-run `$job-setup` as you add new documents - it merges intelligently and will never overwrite existing content without asking you first.
+This folder holds your actual career documents. The `$job-setup` skill reads them
+and populates the ignored local profile overlay under
+`documents/cv/codex_profile/`. Tracked Codex references remain blank framework
+templates. It is safe to rerun setup as documents are added: it merges supported
+facts and asks before resolving conflicts or overwriting local content.
 
 ---
 
@@ -90,8 +94,8 @@ Reference letters from former managers, supervisors, or collaborators.
 
 **What `$job-setup` extracts:**
 - Referee name, title, and organization
-- Specific quotes and assessments (added to the references section of `01-candidate-profile.md`)
-- Competency language used by referees (adds behavioral signal to `02-behavioral-profile.md`)
+- Specific quotes and assessments (added to the local candidate profile)
+- Competency language used by referees (adds local behavioral signal)
 
 **Naming:** Use the referee's name, e.g. `reference_ole_frandsen.pdf`.
 

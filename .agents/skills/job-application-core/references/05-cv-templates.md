@@ -1,5 +1,5 @@
 ---
-framework_version: 1.0.0
+framework_version: 1.4.0
 ---
 
 # CV Templates and Tailoring Guide
@@ -10,17 +10,17 @@ framework_version: 1.0.0
 
 All CVs use the moderncv LaTeX package with the "banking" style and "blue" color scheme.
 
-**Output file:** `cv/main_<company>.tex`
+**Output file:** `cv/main_<company>_<role>.tex`
 **Compile with:** **lualatex** on MiKTeX/TeX Live. pdflatex often fails on modern MiKTeX installs with `fontawesome5` font-expansion errors; lualatex handles the same sources cleanly.
 **Master reference:** `cv/main_example.tex` (comprehensive CV with all competencies, experience, and achievements - use as source when building targeted CVs)
 
 ### Compile command
 
 ```bash
-cd cv && lualatex -interaction=nonstopmode main_<company>.tex
+cd cv && lualatex -interaction=nonstopmode main_<company>_<role>.tex
 ```
 
-Expected output: `Output written on main_<company>.pdf (2 pages, ...)`. Any page count other than 2 is a failure that must be fixed before presenting to the user.
+Expected output: `Output written on main_<company>_<role>.pdf (2 pages, ...)`. Any page count other than 2 is a failure that must be fixed before presenting to the user.
 
 ## Document Structure
 
@@ -109,7 +109,18 @@ argument.
 
 ## Section-by-Section Tailoring
 
+### CV Language and Literal Headings
+
+Use the locally recorded CV language, defaulting to English. When it is not
+English, translate every literal section heading and fixed line, including
+competencies, experience, education, languages, publications, awards, references,
+and availability text. A translated body under English headings is not complete.
+
 ### Profile Statement / Elevator Pitch (Best Practice)
+
+For a cross-domain role, put the verified domain-transfer argument in the opening
+instead of burying it in the cover letter. Archived profile statements are
+phrasing references only and do not vouch for their own facts.
 This is the most important section to customize. It appears right after `\makecvtitle`.
 
 Write 5-7 lines that function as an "elevator pitch": a concise, compelling introduction explaining why you're qualified for *this specific role*. Focus on what the employer gains from hiring you.
@@ -128,15 +139,32 @@ Reorder and emphasize based on the role. Use bold category labels.
 
 List **5-7 key competencies** in bullet format, tailored to the specific job. For each competency, briefly explain how it adds value to the position.
 
+Use the posting's exact core term in a competency label when, and only when, the
+candidate's evidence supports that term.
+
 ### Education
 - Always include your highest degrees
 - For senior roles, keep education brief (dates and titles only)
 - Include thesis topics when relevant to the target role
 
+State every in-progress degree, course, or certification explicitly as in
+progress with the verified expected completion date. The profile statement,
+education entry, and availability/work-permit note must agree.
+
 ### Professional Experience
 - Rewrite bullet points to emphasize aspects most relevant to the target role
 - Use 4-6 bullets for most recent role, 3-4 for previous, 2-3 for older
 - **Emphasize measurable results** where possible: "Reduced processing time by X%", "Model adopted by the team"
+
+Check each role's date span against visible output. Surface more real work, make
+verified phases explicit, or explain genuine long-cycle delivery. Never invent a
+project, shorten employment dates, or inflate ownership to improve the ratio.
+Prepare an honest interview answer when little visible output remains.
+
+### Evidence Links
+
+Carry a verified public link for named projects, publications, awards, or other
+artifacts when useful. Do not create or guess links.
 
 ### Handling Employment Gaps (Best Practice)
 If there is a gap in your employment history:
@@ -161,7 +189,7 @@ If there is a gap in your employment history:
 
 After writing the CV and before presenting to the user, always compile and visually inspect the PDF. Iterate until the layout is clean. Workflow:
 
-1. Run `lualatex -interaction=nonstopmode main_<company>.tex`
+1. Run `lualatex -interaction=nonstopmode main_<company>_<role>.tex`
 2. Check the output page count: must be exactly 2
 3. Inspect the rendered PDF with the available PDF viewing or rendering capability and visually inspect both pages
 4. Check for **orphaned entries**: a `\cventry` title line must never sit alone at the bottom of page 1 with its bullets on page 2
@@ -175,6 +203,9 @@ Add `\needspace{5\baselineskip}` immediately before the problematic `\cventry`:
 \cventry{YEAR--YEAR}{Role Title}{Organization}{Location}{}{...}
 ```
 Include `\usepackage{needspace}` in the preamble.
+
+Use `\needspace` before a specific orphaning entry, never before a section
+heading; section-level use can strand whitespace and add a page.
 
 **Problem: one trailing section spills to page 3 (e.g., References alone on page 3)**
 Add `\enlargethispage{2-3\baselineskip}` before a late section (e.g., before `\section{Honors and Awards}`) to stretch page 2 by a few lines. This is the standard LaTeX rescue for near-miss overflows.
@@ -190,7 +221,7 @@ Restore the highest-relevance item that was previously cut — a CV that ends mi
 Most employers run CVs through an ATS before a human sees them, and the ATS reads the PDF's embedded **text layer**, not the rendered page. A CV can pass visual inspection and still extract as garbage. After the layout passes the compile-and-inspect loop, verify the text layer:
 
 ```bash
-cd cv && pdftotext -layout main_<company>.pdf main_<company>.txt
+cd cv && pdftotext -layout main_<company>_<role>.pdf main_<company>_<role>.txt
 ```
 
 `pdftotext` comes from [poppler](https://poppler.freedesktop.org/), not the TeX distribution - it is an **optional** dependency. If it is not installed, skip the mechanical check with a warning and rely on the visual PDF read for keyword coverage.
@@ -203,6 +234,14 @@ What to check in the extraction:
 - **Keyword coverage.** Match the posting's required/preferred terms against the extracted text, in the posting's language. Prefer the posting's exact term over a synonym when it is truthfully applicable - ATS matching is often literal. Never add a keyword the profile does not support.
 
 ## Page Budget - Hard 2-Page Limit
+
+### ATS Date Fields
+
+Use a single ASCII hyphen in date-range arguments, for example `2019-2024` or
+`Mar 2019 - Jul 2019`. LaTeX `--` renders as an en dash that some ATS importers
+fail to split. A lone year has no end date, so use a verified explicit range when
+known, but never invent a missing start date. Check extracted text for both date
+ends after compilation.
 
 The CV **must** fit on exactly 2 pages when compiled. Use these content limits as a guide:
 

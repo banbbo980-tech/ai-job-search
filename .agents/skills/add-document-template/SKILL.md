@@ -1,11 +1,11 @@
 ---
 name: add-document-template
-description: Codex workflow for registering custom LaTeX CV or cover-letter templates. Use to list templates, activate a template, deactivate custom templates, inspect a user-provided .tex/.cls/.sty/font bundle, create TEMPLATE.md manifests, run mandatory test compiles, and wire templates into application generation.
+description: Codex workflow for registering custom CV or cover-letter templates that compile to PDF. Use to list, activate, or deactivate templates; inspect LaTeX, Typst, or another command-line source bundle; create manifests; run mandatory test compiles; and wire templates into application generation.
 ---
 
 # Add Document Template
 
-Register custom LaTeX templates without weakening compile, layout, privacy, or
+Register custom PDF-producing templates without weakening compile, layout, privacy, or
 ATS requirements.
 
 ## Arguments
@@ -18,8 +18,8 @@ ATS requirements.
 
 ## Listing and Switch Mode
 
-For `--list`, read `templates/**/TEMPLATE.md` and show name, type, engine, fonts,
-page limit, and active status. A template is active when the matching
+For `--list`, read `templates/**/TEMPLATE.md` and show name, type, source
+extension, compile command/toolchain, fonts, page limit, and active status. A template is active when the matching
 job-application-core template reference contains an `ACTIVE-TEMPLATE` managed
 block naming it. If no custom templates exist, say so and explain that
 `$add-document-template` registers one.
@@ -34,9 +34,9 @@ For `--use <name>`:
    `$add-document-template --list`.
 4. If more than one manifest matches, stop, list the matching manifest paths,
    and ask the user to rename one template. Activation must be unambiguous.
-5. Read the matching `TEMPLATE.md` and extract type, engine, page limit, and the
-   full font summary line.
-6. Verify `template.tex` exists beside the manifest. If it is missing, stop
+5. Read the matching `TEMPLATE.md` and extract type, source extension, full
+   compile command, engine/toolchain label, page limit, and font summary.
+6. Verify `template<source-extension>` exists beside the manifest. If it is missing, stop
    because registration is incomplete.
 7. Derive the template kind from the manifest path:
    `templates/cv/<name>/TEMPLATE.md` means CV, and
@@ -48,11 +48,14 @@ For `--use <name>`:
 ## Registration Workflow
 
 1. Determine template type: CV or cover letter.
-2. Read the provided `.tex` file and any referenced `.cls`, `.sty`, fonts, or
-   assets. If a required local class/style file is missing, ask for it.
+2. Read the provided source and referenced classes, packages, fonts, or assets.
+   Ask for any required missing local dependency.
 3. Infer and confirm:
    - Template name, kebab-case.
-   - Compile engine: `lualatex`, `xelatex`, or `pdflatex`.
+   - Source extension such as `.tex` or `.typ`.
+   - Full compile command using `<file>` as the basename placeholder, plus an
+     engine/toolchain display label. Infer LaTeX or Typst commands; ask for other
+     toolchains.
    - Fonts and whether they are bundled, system, or TeX-distribution fonts.
    - Page limit, default two pages for CV and one page for cover letter.
    - Style rules, section order, spacing, colors, date format, and pitfalls.
@@ -60,13 +63,15 @@ For `--use <name>`:
    - `templates/cv/<name>/` for CVs, or
    - `templates/cover_letters/<name>/` for cover letters.
 5. Store:
-   - `template.tex` with personal data replaced by placeholders.
+   - `template<source-extension>` with personal data replaced by placeholders.
    - Any needed `.cls` or `.sty`.
    - Bundled fonts under a relative `fonts/` path.
-   - `TEMPLATE.md` manifest with name, type, engine, fonts, page limit, style
-     rules, known pitfalls, and validation command.
-6. Run a mandatory compile test. If LaTeX is unavailable locally, report the
-   environment block and do not mark the template fully verified.
+   - `TEMPLATE.md` manifest with name, type, source extension, full compile
+     command, toolchain, fonts, page limit, style rules, known pitfalls, and
+     validation command.
+6. Run a mandatory compile test using fictional data and the declared command.
+   If the toolchain is unavailable, report the environment block and do not mark
+   the template fully verified.
 7. Delete every test-compilation scratch file and output after the compile
    attempt: `_compile_test.tex`, `_compile_test.pdf`, `_compile_test.aux`,
    `_compile_test.log`, `_compile_test.out`, `_compile_test.fls`,
@@ -99,7 +104,8 @@ Activation rules:
   guidance.
 - Do not modify text outside the managed markers.
 - Include the skeleton path, manifest path, compile engine, font summary, page
-  limit, and unchanged output-file convention in the block.
+  limit, source extension, full compile command, and role-bearing output-file
+  convention in the block.
 
 ## Rules
 

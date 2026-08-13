@@ -33,6 +33,9 @@ REQUIRED_WORKFLOW_SKILLS = [
     "interview-prep",
     "application-outcome",
     "upskill-analysis",
+    "gmail-sync",
+    "notion-sync",
+    "html-report",
     "add-document-template",
     "add-job-portal",
     "reset-job-profile",
@@ -47,6 +50,8 @@ CORE_REFERENCES = [
     "05-cv-templates.md",
     "06-cover-letter-templates.md",
     "07-interview-prep.md",
+    "08-application-forms.md",
+    "09-web-research.md",
     "search-queries.md",
 ]
 
@@ -60,16 +65,21 @@ FORBIDDEN_ACTIVE_PATTERNS = [
 
 REQUIRED_IGNORE_RULES = [
     "salary_data.json",
-    "job_scraper/seen_jobs.json",
-    "cv/main_*.tex",
+    "**/job_scraper/seen_jobs.json",
+    "**/job_scraper/notion_sync.json",
+    "cv/main_*.*",
     "!cv/main_example.tex",
-    "cover_letters/cover_*.tex",
+    "cover_letters/cover_*.*",
     "documents/cv/**",
     "documents/linkedin/**",
     "documents/diplomas/**",
     "documents/references/**",
     "documents/applications/**",
     "job_search_tracker.csv",
+    "gmail_sync/",
+    "reports/",
+    ".env",
+    ".env.*",
 ]
 
 
@@ -109,6 +119,9 @@ def check_agents(errors: list[str]) -> None:
         "$interview-prep",
         "$application-outcome",
         "$upskill-analysis",
+        "$gmail-sync",
+        "$notion-sync",
+        "$html-report",
         "$reset-job-profile",
         "$sync-upstream",
         "Never invent",
@@ -117,6 +130,7 @@ def check_agents(errors: list[str]) -> None:
         "lualatex",
         "xelatex",
         "Subagent Review",
+        "Private Profile Overlay",
     ]:
         if phrase not in text:
             errors.append(f"AGENTS.md: missing required guidance phrase {phrase!r}")
@@ -203,6 +217,13 @@ def check_skills(errors: list[str]) -> None:
         elif f"${skill}" not in read_text(openai_yaml):
             errors.append(f"{rel(openai_yaml)}: default prompt must mention ${skill}")
 
+    # Portal and extension skills are active Codex surfaces too, even when they
+    # are not in the required workflow list above.
+    for skill_file in sorted((ROOT / ".agents" / "skills").glob("*/SKILL.md")):
+        for pattern, label in FORBIDDEN_ACTIVE_PATTERNS:
+            if pattern.search(read_text(skill_file)):
+                errors.append(f"{rel(skill_file)}: active workflow contains {label}")
+
 
 def check_core_references(errors: list[str]) -> None:
     ref_dir = ROOT / ".agents" / "skills" / "job-application-core" / "references"
@@ -228,6 +249,12 @@ def check_workflow_contracts(errors: list[str]) -> None:
         "xelatex",
         "pdftotext",
         "missing (gap)",
+        "Eligibility Gate",
+        "Language Gate",
+        "Record the Drafted Application",
+        "application_form_fields.txt",
+        "main_<company>_<role>",
+        "verbatim posting",
     ]
     for phrase in required_apply_phrases:
         if phrase not in job_apply:
@@ -246,7 +273,7 @@ def check_workflow_contracts(errors: list[str]) -> None:
         "Switch Mode",
         "parent folder name exactly",
         "If more than one manifest matches",
-        "Verify `template.tex` exists",
+        "Verify `template<source-extension>` exists",
         "Do not re-run registration",
         "`--use default` removes the managed block",
         "Exactly one managed block",
@@ -255,10 +282,37 @@ def check_workflow_contracts(errors: list[str]) -> None:
         "_compile_test.fdb_latexmk",
         "_compile_test.synctex.gz",
         "_compile_test.*",
+        "full compile command",
+        "Source extension",
     ]
     for phrase in required_add_template_phrases:
         if phrase not in add_template:
             errors.append(f"add-document-template skill: missing upstream parity contract {phrase!r}")
+
+    outcome = read_text(ROOT / ".agents" / "skills" / "application-outcome" / "SKILL.md")
+    for phrase in ["Tracker Status Vocabulary", "`drafted`", "Follow-Up Branch", "fewer than two"]:
+        if phrase not in outcome:
+            errors.append(f"application-outcome skill: missing lifecycle contract {phrase!r}")
+
+    add_portal = read_text(ROOT / ".agents" / "skills" / "add-job-portal" / "SKILL.md")
+    for phrase in ["MISSING_CREDENTIALS", "<SERVICE>_API_TOKEN", "honest identifying user agent", "dynamic CI"]:
+        if phrase not in add_portal:
+            errors.append(f"add-job-portal skill: missing portal contract {phrase!r}")
+
+    for skill, phrases in {
+        "gmail-sync": ["read-only mailbox", "approval", "30 or more days", "never sends"],
+        "notion-sync": ["One-way", "approval", "notion_sync.json", "filenames"],
+        "html-report": ["self-contained", "Escape every local value", "reports/", "Never upload"],
+    }.items():
+        text = read_text(ROOT / ".agents" / "skills" / skill / "SKILL.md")
+        for phrase in phrases:
+            if phrase.lower() not in text.lower():
+                errors.append(f"{skill} skill: missing integration contract {phrase!r}")
+
+    core = read_text(ROOT / ".agents" / "skills" / "job-application-core" / "SKILL.md")
+    for phrase in ["documents/cv/codex_profile/", "Never write", "08-application-forms.md", "09-web-research.md"]:
+        if phrase not in core:
+            errors.append(f"job-application-core skill: missing privacy/reference contract {phrase!r}")
 
 
 def check_gitignore(errors: list[str]) -> None:

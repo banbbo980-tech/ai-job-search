@@ -5,9 +5,9 @@ description: Codex onboarding workflow for the AI Job Search project. Use for in
 
 # Job Setup
 
-Build or refresh the candidate profile without inventing facts. This workflow is
-idempotent: re-running it should add supported information, surface conflicts,
-and preserve valid existing profile data.
+Build or refresh the candidate profile without inventing facts. The workflow is
+idempotent and privacy-first: real profile data is written only to the ignored
+local overlay under `documents/cv/codex_profile/`.
 
 ## Inputs
 
@@ -20,13 +20,15 @@ and preserve valid existing profile data.
 
 ## Active Outputs
 
-Update the Codex reference files under:
+- `documents/cv/codex_profile/01-candidate-profile.md`
+- `documents/cv/codex_profile/02-behavioral-profile.md`
+- `documents/cv/codex_profile/profile-summary.md`
+- `documents/cv/codex_profile/search-preferences.md`
 
-`../job-application-core/references/`
-
-Also update root `AGENTS.md` only when durable repository workflow rules change.
-Keep legacy `.claude/` files untouched unless the user explicitly asks for
-legacy synchronization during the transition.
+Before any write, run `git ls-files --error-unmatch` and `git check-ignore -v`
+for every target. Stop if a target is tracked or not ignored. Never place personal
+facts in tracked shared references, `AGENTS.md`, `CLAUDE.md`, example documents,
+tests, or public documentation.
 
 ## Workflow
 
@@ -37,8 +39,9 @@ legacy synchronization during the transition.
    - Path B: import one pasted or attached CV/resume.
    - Path C: conduct an interview-style setup.
 3. For `--section <name>`, skip path selection and update only that section.
-4. Read the existing Codex reference files before extracting new data. Use that
-   current state to avoid duplicates and detect conflicts.
+4. Read the local profile overlay first and the tracked shared references only as
+   blank structure/rules. Use current local state to avoid duplicates and detect
+   conflicts.
 5. Extract only evidence-backed facts:
    - CV: identity, contact, education, experience, skills, publications, awards.
    - LinkedIn: about text, experience, education, skills, certifications,
@@ -55,23 +58,24 @@ legacy synchronization during the transition.
    skip numbered items, or resolve conflicts.
 9. Apply only confirmed changes with targeted edits. Do not rewrite whole files
    unless creating a blank template or replacing placeholder-only content.
-10. Fill remaining gaps through concise follow-up questions: career goals,
-    target roles, location constraints, deal-breakers, writing style, STAR
-    examples, and search configuration. When asking about portals, explain that
-    the project ships country-agnostic `linkedin-search` and `freehire-search`
-    CLIs plus Danish portal examples, and that `$job-search` auto-discovers
-    installed portal skills under `.agents/skills/`. If the user needs another
-    local board, suggest `$add-job-portal`; web `site:` queries remain the
-    fallback for portals without a CLI.
-11. Update `references/search-queries.md` from the final search configuration.
-12. Summarize files changed, unresolved conflicts, gaps left for the user, and
+10. Fill remaining gaps one question at a time: career goals, target roles,
+    location constraints, work authorization, deal-breakers, writing style, STAR
+    examples, professional languages with honest levels, preferred CV language,
+    and search configuration.
+11. Discover portal skills under `.agents/skills/`. Explain that LinkedIn and
+    Freehire are enabled defaults and Danish examples may have `enabled: false`.
+    Enable or disable only the frontmatter toggle, and only after the user chooses
+    the relevant markets. Suggest `$add-job-portal` for another public board.
+12. Update the ignored local `search-preferences.md`; never personalize the
+    tracked `references/search-queries.md` template.
+13. Summarize files changed, unresolved conflicts, gaps left for the user, and
     suggested next skills: `$job-search` and `$job-apply`.
 
 ## Section Updates
 
-For `--section search`, update only `references/search-queries.md` and the
-search-related parts of the evaluation framework. Suggest role types based on
-the complete profile, but let the user accept or reject them.
+For `--section search`, update only local `search-preferences.md`. Suggest role
+types based on the complete verified profile, but let the user accept or reject
+them. Record each query category in every professional language the user selected.
 
 For STAR examples, draft only from actual experience. If the evidence is thin,
 create STAR candidate stubs for the user to complete rather than fabricating a
@@ -82,5 +86,5 @@ result.
 - Every new claim must trace to a document, user answer, or cited public source.
 - Inferred behavioral or writing-style observations must be labeled as inferred.
 - Existing valid content must not be overwritten without explicit confirmation.
-- Personal documents and generated profile details must remain local and must
-  not be added to public docs or tests.
+- Personal documents and generated profile details must remain ignored and
+  untracked. Re-run `git check-ignore` and `git status --short` after writing.

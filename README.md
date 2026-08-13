@@ -87,6 +87,9 @@ done
 ```
 
 3. Put private source documents under `documents/`, or be ready to paste a CV.
+   `$job-setup` writes real profile data only to the ignored
+   `documents/cv/codex_profile/` overlay; tracked shared references stay as
+   reusable placeholders.
 4. Ask Codex:
 
 ```text

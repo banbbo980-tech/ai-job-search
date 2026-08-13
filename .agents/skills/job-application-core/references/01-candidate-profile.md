@@ -1,5 +1,5 @@
 ---
-framework_version: 1.0.0
+framework_version: 1.1.1
 ---
 
 # Candidate Profile
@@ -14,9 +14,20 @@ framework_version: 1.0.0
 - **Email:** [YOUR_EMAIL]
 - **LinkedIn:** [YOUR_LINKEDIN_URL]
 - **GitHub:** [YOUR_GITHUB_URL]
-- **Languages:** [YOUR_LANGUAGES with proficiency levels]
 - **Status:** [YOUR_EMPLOYMENT_STATUS]
 - **Constraints:** [YOUR_COMMUTE_OR_LOCATION_CONSTRAINTS]
+- **Work authorization:** [COUNTRIES/PERMIT_CLASSES/DATE_OR_HOUR_LIMITS]
+- **CV language:** [LANGUAGE, default English]
+
+### Languages
+
+Every language used professionally must have an honest level. An undeclared
+language required by a posting is a hard mismatch; do not add a language merely
+to pass the gate.
+
+| Language | Level | Notes |
+|----------|-------|-------|
+| [LANGUAGE] | [Native / CEFR / plain-language level] | [optional] |
 
 ## Education
 

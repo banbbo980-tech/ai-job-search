@@ -1,0 +1,4 @@
+interface:
+  display_name: "Gmail Sync"
+  short_description: "Review application email status safely"
+  default_prompt: "Use $gmail-sync to review new application-status email and propose tracker updates."

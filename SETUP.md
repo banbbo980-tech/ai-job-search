@@ -123,6 +123,7 @@ Use these local paths:
 - `documents/references/`
 - `documents/postings/`
 - `documents/applications/`
+- `documents/cv/codex_profile/` for the generated private profile overlay
 
 Before writing personal data, run `git check-ignore -v <path>` and
 `git ls-files --error-unmatch <path>`. Stop if the target is tracked. A public
@@ -139,6 +140,8 @@ Setup can read the documents folder, import one CV, or interview the user.
 It records languages with honest proficiency levels for the Language Gate and
 records the preferred CV language separately. Danish demonstration portals
 ship disabled and are enabled only for users who want the Danish market.
+Tracked files under `.agents/skills/job-application-core/references/` remain
+framework templates; setup never writes personal facts there.
 
 To refresh search settings only:
 

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Notion Sync"
+  short_description: "Sync pipeline metadata to Notion"
+  default_prompt: "Use $notion-sync to preview and sync my local job pipeline to Notion."
