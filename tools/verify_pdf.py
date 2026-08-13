@@ -30,7 +30,9 @@ def run_tool(command):
         return decode_output(result.stdout)
     except FileNotFoundError as exc:
         raise VerificationError(
-            f"required command '{command[0]}' was not found; install poppler-utils"
+            f"required command '{command[0]}' was not found. "
+            "Install poppler-utils (macOS: brew install poppler, "
+            "Debian/Ubuntu: apt install poppler-utils, Windows: choco install poppler)"
         ) from exc
     except subprocess.CalledProcessError as exc:
         stderr = decode_output(exc.stderr)

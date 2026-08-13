@@ -1,3 +1,7 @@
+---
+framework_version: 1.0.0
+---
+
 # AI Job Search Codex Guide
 
 ## Project Purpose

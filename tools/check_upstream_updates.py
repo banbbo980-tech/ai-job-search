@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Read-only upstream update checker for the Codex migration branch.
 
-The checker fetches or inspects `upstream/master`, compares it with
-docs/upstream-state.json, and reports what would need conversion. It never
-merges, commits, or pushes.
+The checker compares ``docs/upstream-state.json`` with ``upstream/master`` and
+reports commits, changed files, Claude-specific conversion work, and framework
+version drift. It never merges, commits, or pushes.
 """
 
 from __future__ import annotations
@@ -22,17 +22,21 @@ DEFAULT_STATE = ROOT / "docs" / "upstream-state.json"
 UPSTREAM_REMOTE = "upstream"
 UPSTREAM_BRANCH = "master"
 HEX_RE = re.compile(r"^[0-9a-f]{40}$", re.I)
-SYNC_BRANCH_RE = re.compile(r"^sync/upstream-\d{4}-\d{2}-\d{2}-[0-9a-f]{7,40}$", re.I)
-FRAMEWORK_SKILL_DIR = ".claude/skills/job-application-assistant"
+SYNC_BRANCH_RE = re.compile(
+    r"^sync/upstream-\d{4}-\d{2}-\d{2}-[0-9a-f]{7,40}$", re.I
+)
 FRAMEWORK_FILES = [
-    "01-candidate-profile.md",
-    "02-behavioral-profile.md",
-    "03-writing-style.md",
-    "04-job-evaluation.md",
-    "05-cv-templates.md",
-    "06-cover-letter-templates.md",
-    "07-interview-prep.md",
-    "SKILL.md",
+    ".claude/skills/job-application-assistant/01-candidate-profile.md",
+    ".claude/skills/job-application-assistant/02-behavioral-profile.md",
+    ".claude/skills/job-application-assistant/03-writing-style.md",
+    ".claude/skills/job-application-assistant/04-job-evaluation.md",
+    ".claude/skills/job-application-assistant/05-cv-templates.md",
+    ".claude/skills/job-application-assistant/06-cover-letter-templates.md",
+    ".claude/skills/job-application-assistant/07-interview-prep.md",
+    ".claude/skills/job-application-assistant/08-application-forms.md",
+    ".claude/skills/job-application-assistant/09-web-research.md",
+    ".claude/skills/job-application-assistant/SKILL.md",
+    "AGENTS.md",
 ]
 
 
@@ -53,10 +57,10 @@ def git(repo: Path, *args: str, check: bool = True) -> subprocess.CompletedProce
 
 
 def normalize_url(url: str) -> str:
-    url = url.strip().rstrip("/")
-    if url.endswith(".git"):
-        url = url[:-4]
-    return url
+    normalized = url.strip().rstrip("/")
+    if normalized.endswith(".git"):
+        normalized = normalized[:-4]
+    return normalized.casefold()
 
 
 def load_state(path: Path) -> dict[str, Any]:
@@ -84,7 +88,10 @@ def load_state(path: Path) -> dict[str, Any]:
     if data["schema_version"] != 1:
         raise SafeError("state file schema_version must be 1")
     if not HEX_RE.match(data["last_integrated_upstream_commit"]):
-        raise SafeError("state file last_integrated_upstream_commit must be a full 40-character commit hash")
+        raise SafeError(
+            "state file last_integrated_upstream_commit must be a full "
+            "40-character commit hash"
+        )
     if not re.match(r"^\d{4}-\d{2}-\d{2}$", data["integration_date"]):
         raise SafeError("state file integration_date must use YYYY-MM-DD")
     return data
@@ -93,15 +100,18 @@ def load_state(path: Path) -> dict[str, Any]:
 def ensure_clean(repo: Path) -> None:
     status = git(repo, "status", "--porcelain").stdout.strip()
     if status:
-        raise SafeError("working tree is dirty; commit or stash local changes before checking upstream updates")
+        raise SafeError(
+            "working tree is dirty; commit or stash local changes before "
+            "checking upstream updates"
+        )
 
 
 def ensure_branch(repo: Path, expected_branch: str) -> str:
     branch = git(repo, "rev-parse", "--abbrev-ref", "HEAD").stdout.strip()
     if branch != expected_branch and not SYNC_BRANCH_RE.match(branch):
         raise SafeError(
-            f"current branch is {branch!r}; expected stable Codex branch {expected_branch!r} "
-            "or a sync/upstream-YYYY-MM-DD-<sha> update branch"
+            f"current branch is {branch!r}; expected stable Codex branch "
+            f"{expected_branch!r} or a sync/upstream-YYYY-MM-DD-<sha> update branch"
         )
     return branch
 
@@ -145,7 +155,9 @@ def change_categories(status: str, paths: list[str]) -> list[str]:
             categories.append("claude-command")
         elif path.startswith(".claude/skills/"):
             categories.append("claude-skill")
-        elif (path.startswith(".agents/skills/") and "/cli/" in path) or path.startswith("job_scraper/"):
+        elif (path.startswith(".agents/skills/") and "/cli/" in path) or path.startswith(
+            "job_scraper/"
+        ):
             categories.append("portal-integration")
         elif path.startswith(("cv/", "cover_letters/", "templates/")):
             categories.append("document-template")
@@ -153,6 +165,10 @@ def change_categories(status: str, paths: list[str]) -> list[str]:
             categories.append("documentation")
         elif path.startswith("tests/"):
             categories.append("test")
+        elif path.startswith(".github/workflows/"):
+            categories.append("ci")
+        elif path in {".gitignore", "SECURITY.md", "tools/security_guards.py"}:
+            categories.append("security")
     return sorted(set(categories))
 
 
@@ -170,7 +186,9 @@ def parse_name_status(raw: str) -> list[dict[str, Any]]:
                 "status": status,
                 "paths": paths,
                 "categories": categories,
-                "claude_specific": any(category.startswith("claude-") for category in categories),
+                "claude_specific": any(
+                    category.startswith("claude-") for category in categories
+                ),
             }
         )
     return changes
@@ -198,17 +216,23 @@ def parse_semver(version: str) -> tuple[int, int, int]:
     return tuple(int(part) for part in match.groups())
 
 
-def compare_framework_versions(repo: Path, upstream_ref: str) -> list[dict[str, str | None]]:
+def compare_framework_versions(
+    repo: Path, upstream_ref: str
+) -> tuple[list[dict[str, str | None]], list[str]]:
     updates: list[dict[str, str | None]] = []
-    for filename in FRAMEWORK_FILES:
-        rel_path = f"{FRAMEWORK_SKILL_DIR}/{filename}"
+    missing_upstream: list[str] = []
+    for rel_path in FRAMEWORK_FILES:
         local_path = repo / rel_path
         local_version = None
         if local_path.exists():
-            local_version = get_framework_version_from_text(local_path.read_text(encoding="utf-8"))
+            local_version = get_framework_version_from_text(
+                local_path.read_text(encoding="utf-8")
+            )
 
         upstream_result = git(repo, "show", f"{upstream_ref}:{rel_path}", check=False)
         if upstream_result.returncode != 0:
+            if local_path.exists():
+                missing_upstream.append(rel_path)
             continue
         upstream_version = get_framework_version_from_text(upstream_result.stdout)
         if not upstream_version:
@@ -222,7 +246,7 @@ def compare_framework_versions(repo: Path, upstream_ref: str) -> list[dict[str, 
                     "upstream": upstream_version,
                 }
             )
-    return updates
+    return updates, missing_upstream
 
 
 def check_updates(repo: Path, state_path: Path, fetch: bool = True) -> dict[str, Any]:
@@ -247,11 +271,15 @@ def check_updates(repo: Path, state_path: Path, fetch: bool = True) -> dict[str,
         commits: list[str] = []
         changes: list[dict[str, Any]] = []
     else:
-        commits = git(repo, "log", "--oneline", f"{recorded_commit}..{upstream_ref}").stdout.splitlines()
-        raw_changes = git(repo, "diff", "--name-status", recorded_commit, upstream_ref).stdout
+        commits = git(
+            repo, "log", "--oneline", f"{recorded_commit}..{upstream_ref}"
+        ).stdout.splitlines()
+        raw_changes = git(
+            repo, "diff", "--name-status", recorded_commit, upstream_ref
+        ).stdout
         changes = parse_name_status(raw_changes)
-    framework_version_updates = compare_framework_versions(repo, upstream_ref)
 
+    framework_updates, missing_upstream = compare_framework_versions(repo, upstream_ref)
     short = upstream_commit[:7]
     today = _dt.date.today().isoformat()
     updates_available = recorded_commit != upstream_commit
@@ -269,9 +297,14 @@ def check_updates(repo: Path, state_path: Path, fetch: bool = True) -> dict[str,
         "file_change_count": len(changes),
         "commits": commits,
         "changed_files": changes,
-        "claude_specific_changes": [change for change in changes if change["claude_specific"]],
-        "framework_version_updates": framework_version_updates,
-        "recommended_sync_branch": f"sync/upstream-{today}-{short}" if updates_available else None,
+        "claude_specific_changes": [
+            change for change in changes if change["claude_specific"]
+        ],
+        "framework_version_updates": framework_updates,
+        "framework_files_missing_upstream": missing_upstream,
+        "recommended_sync_branch": (
+            f"sync/upstream-{today}-{short}" if updates_available else None
+        ),
     }
 
 
@@ -283,44 +316,64 @@ def print_text(report: dict[str, Any]) -> None:
     print(f"Recorded official commit: {report['recorded_commit']}")
     print(f"Current upstream/master: {report['upstream_commit']}")
 
-    if not report["updates_available"]:
+    if report["updates_available"]:
+        print(
+            "Status: updates available "
+            f"({report['commit_count']} commit(s), "
+            f"{report['file_change_count']} file change(s))."
+        )
+        print(f"Recommended sync branch: {report['recommended_sync_branch']}")
+        print("\nOfficial commits:")
+        for commit in report["commits"]:
+            print(f"- {commit}")
+
+        print("\nChanged official files:")
+        for change in report["changed_files"]:
+            path_text = " -> ".join(change["paths"])
+            categories = ", ".join(change["categories"]) or "general"
+            print(f"- {change['status']} {path_text} [{categories}]")
+
+        if report["claude_specific_changes"]:
+            print("\nClaude-specific changes requiring semantic Codex conversion:")
+            for change in report["claude_specific_changes"]:
+                print(f"- {' -> '.join(change['paths'])}")
+    else:
         print("Status: up to date; no official updates are available.")
-        return
 
-    print(
-        "Status: updates available "
-        f"({report['commit_count']} commit(s), {report['file_change_count']} file change(s))."
-    )
-    print(f"Recommended sync branch: {report['recommended_sync_branch']}")
-    print("\nOfficial commits:")
-    for commit in report["commits"]:
-        print(f"- {commit}")
-
-    print("\nChanged official files:")
-    for change in report["changed_files"]:
-        path_text = " -> ".join(change["paths"])
-        categories = ", ".join(change["categories"]) or "general"
-        print(f"- {change['status']} {path_text} [{categories}]")
-
-    if report["claude_specific_changes"]:
-        print("\nClaude-specific changes requiring semantic Codex conversion:")
-        for change in report["claude_specific_changes"]:
-            print(f"- {' -> '.join(change['paths'])}")
+    if report["framework_files_missing_upstream"]:
+        print("\nFramework files present locally but missing from upstream:")
+        for path in report["framework_files_missing_upstream"]:
+            print(f"- {path}")
 
     if report["framework_version_updates"]:
         print("\nFramework version markers newer upstream:")
         for update in report["framework_version_updates"]:
-            print(f"- {update['path']}: local {update['local']} < upstream {update['upstream']}")
+            print(
+                f"- {update['path']}: local {update['local']} "
+                f"< upstream {update['upstream']}"
+            )
 
-    print("\nNext safe step: create the sync branch, import changes there, convert behavior, test parity, and ask before merging.")
+    print(
+        "\nFor commit-level advisory triage, run: "
+        "python tools/upstream_triage.py --remote upstream --branch master"
+    )
+    if report["updates_available"]:
+        print(
+            "Next safe step: create the sync branch, import changes there, "
+            "convert behavior, test parity, and ask before merging."
+        )
 
 
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--repo", type=Path, default=ROOT, help="Repository root to inspect")
-    parser.add_argument("--state", type=Path, default=DEFAULT_STATE, help="Path to upstream-state.json")
-    parser.add_argument("--no-fetch", action="store_true", help="Inspect existing upstream/master without network fetch")
-    parser.add_argument("--json", action="store_true", help="Print machine-readable JSON")
+    parser.add_argument("--repo", type=Path, default=ROOT, help="Repository root")
+    parser.add_argument(
+        "--state", type=Path, default=DEFAULT_STATE, help="Path to upstream-state.json"
+    )
+    parser.add_argument(
+        "--no-fetch", action="store_true", help="Inspect cached upstream/master"
+    )
+    parser.add_argument("--json", action="store_true", help="Print JSON")
     return parser.parse_args(argv)
 
 

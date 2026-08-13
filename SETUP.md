@@ -1,24 +1,19 @@
 # Setup Guide
 
-This guide gets AI Job Search running in Codex CLI, the ChatGPT desktop app with
+This guide configures AI Job Search for Codex CLI, the ChatGPT desktop app with
 a local project, or ChatGPT Work.
 
 ## 1. Install Prerequisites
 
 ### Codex
 
-Use one of these surfaces:
-
-- **Codex CLI:** open the repository in your terminal and run Codex there.
-- **ChatGPT desktop app:** open this folder as a local project.
-- **ChatGPT Work:** attach or connect the repository according to your workspace
-  policy.
-
-Codex reads the root `AGENTS.md` and the project skills under `.agents/skills/`.
+Open the repository as the working directory. Codex reads `AGENTS.md` and the
+skills under `.agents/skills/`. The legacy `.claude/` tree is retained for
+upstream parity and is not the active runtime.
 
 ### Python
 
-Python 3.10+ is required for salary lookup and tests.
+Python 3.10+ is required for tests and local tools.
 
 ```bash
 python --version
@@ -26,57 +21,50 @@ python --version
 
 ### Bun
 
-The portal search tools are TypeScript CLIs that run with Bun.
+Portal tools are TypeScript CLIs built for Bun. Install Bun for the current
+user using the official Bun instructions or your normal package manager. Do not
+install global software or change system-wide configuration from an automated
+workflow without explicit approval.
 
-Windows PowerShell:
-
-```powershell
-powershell -ExecutionPolicy Bypass -c "irm https://bun.sh/install.ps1 | iex"
-```
-
-If you prefer a Windows package manager, `winget install Oven-sh.Bun` also
-works.
-
-macOS/Linux:
+Verify:
 
 ```bash
-curl -fsSL https://bun.sh/install | bash
+bun --version
 ```
 
-Install portal dependencies from the repository root:
-
-```bash
-for tool in freehire-search jobbank-search jobdanmark-search jobindex-search jobnet-search linkedin-search; do
-  cd .agents/skills/$tool/cli
-  bun install
-  cd ../../../..
-done
-```
+Install all discovered portal dependencies with failure isolated per portal.
 
 PowerShell:
 
 ```powershell
-$tools = @("freehire-search", "jobbank-search", "jobdanmark-search", "jobindex-search", "jobnet-search", "linkedin-search")
-foreach ($tool in $tools) {
-  Set-Location ".agents/skills/$tool/cli"
-  bun install
-  Set-Location "..\..\..\.."
+Get-ChildItem .agents/skills -Directory | ForEach-Object {
+  $cli = Join-Path $_.FullName "cli"
+  if (Test-Path (Join-Path $cli "package.json")) {
+    Push-Location $cli
+    try { bun install } finally { Pop-Location }
+  }
 }
+```
+
+Bash:
+
+```bash
+find .agents/skills -mindepth 3 -maxdepth 3 -path '*/cli/package.json' -print0 |
+while IFS= read -r -d '' manifest; do
+  (cd "$(dirname "$manifest")" && bun install)
+done
 ```
 
 ### LaTeX
 
-Install a LaTeX distribution that includes `lualatex` and `xelatex`.
+The stock CV uses `lualatex`; the stock cover letter uses `xelatex` because
+`cover.cls` uses `fontspec`.
 
 - Windows: MiKTeX
-- macOS: MacTeX or TinyTeX
+- macOS: MacTeX, BasicTeX, or TinyTeX
 - Linux: TeX Live
 
-The stock CV compiles with `lualatex`. The stock cover letter compiles with
-`xelatex` because `cover.cls` uses custom fonts.
-
-Full TeX distributions usually work out of the box. Minimal distributions such
-as TinyTeX or BasicTeX need the stock template packages installed first:
+Minimal TeX installations need these packages:
 
 ```bash
 tlmgr install \
@@ -84,7 +72,10 @@ tlmgr install \
   titlesec textpos xltxtra xunicode cite realscripts needspace
 ```
 
-On macOS, a user-level TinyTeX install avoids a system-wide installer:
+For BasicTeX or MacTeX, ensure `/Library/TeX/texbin` is on `PATH` before
+running `tlmgr`.
+
+For a user-level TinyTeX install on macOS:
 
 ```bash
 curl -fsSL https://yihui.org/tinytex/install-bin-unix.sh -o /tmp/tinytex-install-bin-unix.sh
@@ -92,62 +83,64 @@ sh /tmp/tinytex-install-bin-unix.sh /tmp --no-path
 export PATH="$HOME/Library/TinyTeX/bin/universal-darwin:$PATH"
 ```
 
-For BasicTeX/MacTeX, make sure the TeX binary directory is on `PATH` first, for
-example via `/Library/TeX/texbin`, then run the same `tlmgr install ...`
-command.
+For Basic MiKTeX on Windows, preinstall the required packages or configure
+MiKTeX package auto-installation for the current user so a non-interactive
+compile cannot stall on a GUI prompt. A locked-down production verification
+may use `--disable-installer` after packages are present.
 
-Smoke tests:
+PowerShell smoke tests:
 
-```bash
-cd cv && lualatex -interaction=nonstopmode -halt-on-error main_example.tex
-cd ../cover_letters && xelatex -interaction=nonstopmode -halt-on-error cover_example.tex
+```powershell
+Push-Location cv
+lualatex --disable-installer --halt-on-error --interaction=nonstopmode main_example.tex
+Pop-Location
+Push-Location cover_letters
+xelatex --disable-installer --halt-on-error --interaction=nonstopmode cover_example.tex
+Pop-Location
 ```
 
-### Optional: pdftotext
+### Poppler
 
-`$job-apply` uses Poppler's `pdftotext` for ATS verification.
-
-- macOS: `brew install poppler`
-- Debian/Ubuntu: `sudo apt install poppler-utils`
-- Windows: install Poppler through your preferred package manager, such as
-  Chocolatey with `choco install poppler`
-
-Check:
+Poppler provides `pdftotext`, `pdfinfo`, and `pdftoppm` for ATS, page-count,
+and rendering checks.
 
 ```bash
 pdftotext -v
+pdfinfo -v
+pdftoppm -v
 ```
 
-If unavailable, `$job-apply` reports reduced ATS verification.
+If Bun, LaTeX, or Poppler is unavailable, report the related check as
+`ENVIRONMENT BLOCKED` and preserve CI coverage.
 
-## 2. Add Career Documents Safely
+## 2. Add Private Career Data
 
-Use `documents/` for private local inputs:
+Use these local paths:
 
 - `documents/cv/`
 - `documents/linkedin/`
 - `documents/diplomas/`
 - `documents/references/`
+- `documents/postings/`
 - `documents/applications/`
 
-These contents are ignored by Git. Keep real personal data out of README files,
-tests, examples, and reusable templates.
+Before writing personal data, run `git check-ignore -v <path>` and
+`git ls-files --error-unmatch <path>`. Stop if the target is tracked. A public
+GitHub fork cannot be treated as private storage; use ignored local files or a
+separate private repository for personalized tracked content.
 
-## 3. Run Candidate Setup
-
-Ask Codex:
+## 3. Build the Candidate Profile
 
 ```text
 Use $job-setup to build my profile.
 ```
 
-Setup offers three paths:
+Setup can read the documents folder, import one CV, or interview the user.
+It records languages with honest proficiency levels for the Language Gate and
+records the preferred CV language separately. Danish demonstration portals
+ship disabled and are enabled only for users who want the Danish market.
 
-- Read the `documents/` folder.
-- Import a single pasted or attached CV.
-- Walk through interview-style onboarding.
-
-To update only search configuration:
+To refresh search settings only:
 
 ```text
 Use $job-setup --section search.
@@ -157,14 +150,26 @@ Use $job-setup --section search.
 
 ```text
 Use $job-search to find new jobs.
-Use $job-rank to rank the scraped jobs.
-Use $job-apply for this job posting: <URL or pasted job description>
+Use $job-rank to rank the new jobs.
+Use $job-apply for this posting: <URL or pasted posting>
 ```
 
-When a URL cannot be fetched, paste the full job description. The workflow will
-not fabricate posting details from search snippets.
+Portal skills are auto-discovered. A portal with `enabled: false` remains
+installed but is skipped. Use `$job-search health` for bounded parser health
+checks without a high-volume live search.
 
-## 5. Track Interviews and Outcomes
+When a URL cannot be fetched, save or paste the complete posting. Do not draft
+from a title or search snippet. The workflow checks robots.txt before any
+browser-header retry and never treats a paid fetcher as permission to bypass a
+prohibition.
+
+`$job-apply` evaluates eligibility and fit before drafting. After confirmation
+it creates role-specific document names, optionally creates application-form
+answers, runs an independent review, compiles and visually checks PDFs, verifies
+ATS extraction, records a `drafted` tracker row, and archives the full posting.
+Nothing is submitted automatically.
+
+## 5. Track the Lifecycle
 
 ```text
 Use $interview-prep for my interview at <company>.
@@ -172,51 +177,96 @@ Use $application-outcome to record what happened with <company>.
 Use $upskill-analysis to identify what I should learn next.
 ```
 
-## 6. Optional Salary Data
+`$application-outcome` owns the canonical tracker vocabulary and can draft up
+to two follow-up messages for quiet applications. It never sends them.
 
-If you have salary data, create `salary_data.json` or convert an Excel file:
+## 6. Optional Integrations
+
+### Gmail
+
+Connect a Gmail connector in the current Codex or ChatGPT environment, then:
+
+```text
+Use $gmail-sync to review application-status emails.
+```
+
+The skill reads full messages, proposes sourced changes, and pauses for explicit
+approval before writing local tracker/archive state. It never modifies Gmail.
+
+### Notion
+
+Install and authenticate the Notion connector supported by your Codex or
+ChatGPT environment, then:
+
+```text
+Use $notion-sync to refresh my pipeline view.
+```
+
+The repository remains the source of truth. The sync is one-way, idempotent,
+and uploads no CV or cover-letter contents.
+
+### Offline HTML Dashboard
+
+```text
+Use $html-report to generate my application dashboard.
+```
+
+The self-contained report is written under `reports/`, which is ignored by Git.
+
+## 7. Optional Salary Data
+
+Create local `salary_data.json`, or convert a workbook:
 
 ```bash
 python tools/convert_salary_excel.py path/to/salary-data.xlsx --source "My Salary Data 2026"
+python salary_lookup.py --validate
 ```
 
-If no salary data is configured, `$job-apply` skips salary lookup gracefully.
+Salary data remains local. `$job-apply` skips lookup gracefully when it is not
+configured.
 
-## 7. Verify the Project
+## 8. Verify the Project
 
 ```bash
 python -m unittest discover -s tests -t . -v
 python tools/lint_skills.py
 python tools/security_guards.py
 python tools/codex_compatibility.py
+python tools/check_framework_version.py
+python tools/check_upstream_updates.py --no-fetch
 ```
 
-Run Bun and LaTeX checks when those tools are installed. Environment-blocked
-checks are not migration success; report them as blocked.
+For every `.agents/skills/*/cli/package.json`, run:
+
+```bash
+bun install
+bun run typecheck
+bun test --timeout 30000
+```
+
+## 9. Pull Official Updates Safely
+
+Keep the official repository configured separately:
+
+```bash
+git remote add upstream https://github.com/MadsLorentzen/ai-job-search.git
+git fetch upstream --prune --tags
+python tools/check_upstream_updates.py --no-fetch
+python tools/upstream_triage.py --remote upstream --branch master
+```
+
+Use `$sync-upstream` to prepare a temporary branch. Never merge official
+updates directly into `codex-migration`, and never push to `upstream`.
+`upstream-watch.yml` is advisory only and, when enabled on a fork, updates one
+issue in that fork. It does not merge or push.
 
 ## Troubleshooting
 
-### Bun is missing
-
-Portal CLIs cannot run. Install Bun, restart the terminal/app if needed, and run
-`bun --version`.
-
-### LaTeX is missing
-
-Application drafting can still create `.tex` files, but PDF compile/layout
-verification is blocked until `lualatex` and `xelatex` are installed.
-
-### pdftotext is missing
-
-ATS text-layer verification runs in reduced mode. Install Poppler for the full
-check.
-
-### Salary data is missing
-
-This is expected unless you configured salary benchmarking. `$job-apply` skips
-the optional benchmark.
-
-### A portal blocks access
-
-Some portals block automated requests or restrict scraping. The workflow reports
-that honestly and lets you paste the full posting.
+- `bun` missing: portal CLI checks are environment-blocked; use a permitted web
+  fallback or install Bun for the current user.
+- LaTeX missing: source drafts can be created, but PDF verification is blocked.
+- `pdftotext` missing: ATS verification is reduced and must be reported that way.
+- Portal 429/5xx: shipped CLIs use bounded retry/backoff and 15-second request
+  timeouts; do not increase volume to compensate.
+- Connector unavailable: Gmail and Notion skills exit cleanly without changing
+  local state.
