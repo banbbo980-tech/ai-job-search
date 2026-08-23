@@ -115,6 +115,12 @@ If Bun, LaTeX, or Poppler is unavailable, report the related check as
 
 ## 2. Add Private Career Data
 
+> [!IMPORTANT]
+> A fork of a public GitHub repository is public. This Codex adaptation keeps
+> candidate profiles, source documents, trackers, and generated applications in
+> ignored local paths. Never force-add those files. Use a separate private
+> repository only if personal material must be stored remotely.
+
 Use these local paths:
 
 - `documents/cv/`

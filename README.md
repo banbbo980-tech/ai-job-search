@@ -65,6 +65,12 @@ reported as a passing check.
 1. Clone or open this repository in Codex.
 2. Install each discovered portal CLI in an isolated directory context.
 
+> [!IMPORTANT]
+> A fork of a public GitHub repository is public. This Codex adaptation stores
+> personal profile data, source documents, trackers, and generated applications
+> only in ignored local paths. Verify those paths with `git check-ignore` before
+> writing personal information, and never force-add them to Git.
+
 PowerShell:
 
 ```powershell
