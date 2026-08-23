@@ -39,22 +39,22 @@ class TestForkWarningsAtTheDecisionPoint(unittest.TestCase):
         self.assertIn(
             "personal data",
             body,
-            f"{where}'s fork section must say /setup writes personal data into tracked files",
+            f"{where}'s onboarding section must identify personal data",
         )
-        self.assertRegex(
-            body,
-            re.compile(r"section 8|§8|#8-pulling", re.IGNORECASE),
-            f"{where}'s fork section must point at SETUP.md section 8's private-remote recipe",
+        self.assertIn(
+            "ignored local",
+            body.lower(),
+            f"{where}'s Codex onboarding section must state that personal data stays local and ignored",
         )
 
     def test_readme_quick_start_warns_next_to_the_fork_command(self):
-        body = section(README.read_text(encoding="utf-8"), "### 1. Fork and clone")
-        self.assertIn("gh repo fork", body, "sanity: the fork command lives in this section")
+        body = section(README.read_text(encoding="utf-8"), "## Quick Start")
+        self.assertIn("Clone or open", body, "sanity: the Codex start decision lives here")
         self.assert_warns(body, "README")
 
     def test_setup_guide_warns_next_to_the_fork_command(self):
-        body = section(SETUP_GUIDE.read_text(encoding="utf-8"), "## 2. Fork and clone")
-        self.assertIn("gh repo fork", body, "sanity: the fork command lives in this section")
+        body = section(SETUP_GUIDE.read_text(encoding="utf-8"), "## 2. Add Private Career Data")
+        self.assertIn("git check-ignore", body, "sanity: the private-data decision lives here")
         self.assert_warns(body, "SETUP.md")
 
 

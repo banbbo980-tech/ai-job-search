@@ -30,6 +30,13 @@ for every target. Stop if a target is tracked or not ignored. Never place person
 facts in tracked shared references, `AGENTS.md`, `CLAUDE.md`, example documents,
 tests, or public documentation.
 
+Before the setup interview, inspect `git remote get-url origin`. If it is a
+public GitHub fork or visibility cannot be confirmed, warn the user that pushes
+are public and ask whether to continue with the verified ignored local overlay.
+This check happens before any personal-data write. Never suggest force-adding the
+overlay; use a separate private repository only when the user needs personal data
+stored remotely.
+
 ## Workflow
 
 1. Inspect `documents/` before greeting the user. Report files found in each

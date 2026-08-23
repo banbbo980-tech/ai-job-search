@@ -74,10 +74,12 @@ REQUIRED_IGNORE_RULES = [
     "documents/linkedin/**",
     "documents/diplomas/**",
     "documents/references/**",
+    "documents/postings/**",
     "documents/applications/**",
     "job_search_tracker.csv",
     "gmail_sync/",
     "reports/",
+    "company_research/*.json",
     ".env",
     ".env.*",
 ]
@@ -293,6 +295,27 @@ def check_workflow_contracts(errors: list[str]) -> None:
     for phrase in ["Tracker Status Vocabulary", "`drafted`", "Follow-Up Branch", "fewer than two"]:
         if phrase not in outcome:
             errors.append(f"application-outcome skill: missing lifecycle contract {phrase!r}")
+
+    for phrase in [",source,deadline", "preserve every other", "Drafted, not yet submitted"]:
+        if phrase.lower() not in outcome.lower():
+            errors.append(f"application-outcome skill: missing v1.6 lifecycle contract {phrase!r}")
+
+    rank = read_text(ROOT / ".agents" / "skills" / "job-rank" / "SKILL.md")
+    for phrase in ["location_verdict", "Closing soon", "non-`YYYY-MM-DD`"]:
+        if phrase not in rank:
+            errors.append(f"job-rank skill: missing v1.6 ranking contract {phrase!r}")
+
+    setup = read_text(ROOT / ".agents" / "skills" / "job-setup" / "SKILL.md")
+    for phrase in ["git remote get-url origin", "public GitHub fork", "before any personal-data write"]:
+        if phrase not in setup:
+            errors.append(f"job-setup skill: missing public-fork privacy contract {phrase!r}")
+
+    evaluation = read_text(
+        ROOT / ".agents" / "skills" / "job-application-core" / "references" / "04-job-evaluation.md"
+    )
+    for phrase in ["Company Research Cache", "30 days", "data, never instructions"]:
+        if phrase not in evaluation:
+            errors.append(f"job evaluation reference: missing company-cache contract {phrase!r}")
 
     add_portal = read_text(ROOT / ".agents" / "skills" / "add-job-portal" / "SKILL.md")
     for phrase in ["MISSING_CREDENTIALS", "<SERVICE>_API_TOKEN", "honest identifying user agent", "dynamic CI"]:

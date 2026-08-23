@@ -49,7 +49,7 @@ triage only; `$job-apply` must still re-evaluate the selected posting in depth.
     "behavioral": 0,
     "career": 0
   },
-  "location": "PASS|FAIL|FLAG",
+  "location_verdict": "PASS|FAIL|FLAG",
   "eligibility_gate": "PASS|UNVERIFIED|FAIL",
   "eligibility_note": "verbatim evidence",
   "language_gate": "PASS|FLAG|FAIL",
@@ -72,18 +72,31 @@ triage only; `$job-apply` must still re-evaluate the selected posting in depth.
 12. Apply eligibility, undeclared required-language, and location hard failures as
     vetoes before sorting. A declared language whose level may be below the
     posting bar is a visible `FLAG`, not a veto. A high score never overrides a gate.
-13. Apply location deal-breakers as vetoes. A high-scoring job with location
-    `FAIL` is excluded, not ranked first.
+13. Apply location deal-breakers as vetoes. A high-scoring job with
+    `location_verdict: FAIL` is excluded, not ranked first. Read a legacy
+    PASS/FAIL/FLAG value from `location` only when `location_verdict` is absent;
+    fresh writes keep `location` as the actual place.
 14. Mark past-deadline jobs expired. Deadlines within seven days win ties and
-    receive an urgency note.
-15. Update `job_scraper/seen_jobs.json` additively:
+    receive an urgency note. Reuse stored deadlines for jobs not fetched this
+    run, but treat missing or non-`YYYY-MM-DD` values as absent and report an
+    invalid stored value once with its portal.
+15. Sweep already-ranked entries not re-scored in this run: expire passed stored
+    deadlines and list near deadlines under `Closing soon`. Missing or invalid
+    deadlines are left unchanged and never guessed. `--all` may later revive an
+    entry after a fresh fetch, so the sweep remains reversible.
+16. Update `job_scraper/seen_jobs.json` additively:
     - Ranked jobs: `status`, `rank_score`, `rank_verdict`, `rank_date`.
-    - Persist `strengths`, `gaps`, `eligibility_gate`, `eligibility_note`,
-      `language_gate`, and `language_note` from the current run; replace these
-      current assessment fields rather than accumulating stale duplicates.
+    - Persist `location_verdict`, `strengths`, `gaps`, `eligibility_gate`,
+      `eligibility_note`, `language_gate`, and `language_note` from the current
+      run; replace these current assessment fields rather than accumulating stale
+      duplicates. Refresh `deadline` only when the fresh scoring result returned
+      one; absence is not a correction and must not erase a stored deadline.
     - Expired jobs: `status: "expired"`.
+    - Entries retired by the stored-deadline sweep are also written as expired
+      while all unrelated fields remain untouched.
     - Do not restructure existing entries.
-16. Present URL-bearing shortlist, below-threshold, flagged, and excluded/expired
+17. Present URL-bearing shortlist, below-threshold, flagged, closing-soon, and
+    excluded/expired
     sections. Show language flags beside the title and quote hard-gate evidence.
     Then ask
     whether the user wants to run `$job-apply` for any shortlisted item.

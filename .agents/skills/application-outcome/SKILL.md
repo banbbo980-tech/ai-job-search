@@ -26,11 +26,17 @@ The archive-only `interview_only` value is not a tracker status.
 1. Read `job_search_tracker.csv`. If absent, create it with:
 
 ```csv
-date,company,sector,role,role_type,channel,status,contact_person,fit_rating,notes,cv_file,cover_letter_file,source
+date,company,sector,role,role_type,channel,status,contact_person,fit_rating,notes,cv_file,cover_letter_file,source,deadline
 ```
 
+If an existing header does not end in `,deadline`, append `,deadline` to the
+header line only. Legacy rows then have an empty deadline; do not rewrite them.
+
 2. Identify the target application from the user's argument or list open rows
-   and ask the user to choose.
+   with company, role, applied date, status, deadline, days quiet, and follow-up
+   count, then ask the user to choose. Keep drafted rows in a separate
+   "Drafted, not yet submitted" group: they are never quiet, but a deadline
+   within seven days is urgent and a passed deadline is called out explicitly.
 3. If no row matches, collect company, role, date applied, channel, and posting
    URL, then add a tracker row.
 4. Ask what happened and classify:
@@ -67,9 +73,11 @@ date,company,sector,role,role_type,channel,status,contact_person,fit_rating,note
 <dated notes appended, never overwritten>
 ```
 
-11. Update only the matched tracker row's status and notes. Do not reorder rows
-    or restructure columns. Never reopen a final row or move a row backward
-    without explicit correction from the user.
+11. Update only the matched tracker row's status and notes, plus the application
+    date when moving a `drafted` row to a submitted status. Preserve every other
+    parsed or future field, including `deadline`. Do not reorder rows or
+    restructure columns. Never reopen a final row or move a row backward without
+    explicit correction from the user.
 12. If enough resolved outcomes exist for calibration, suggest `$job-setup` Path
     A to fold feedback into the evaluation framework.
 13. If the recorded status is `hired`, congratulate the user warmly first. Then

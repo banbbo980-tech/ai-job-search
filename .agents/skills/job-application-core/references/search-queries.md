@@ -39,14 +39,19 @@ Secondary (company career pages via Google):
 Queries are grouped by priority. Create each category in every configured
 professional language and combine it with location terms where supported.
 
+Organize categories by the function of the work, not one literal job title.
+Equivalent work may appear under different titles across companies and markets,
+so list several plausible title variants inside each functional category.
+
 ### Priority 1: [YOUR_PRIMARY_ROLE_TYPE]
 
 These match your strongest and most desired career direction.
 
 ```
-site:[YOUR_JOB_BOARD] "[YOUR_PRIMARY_JOB_TITLE]" [YOUR_CITY]
+site:[YOUR_JOB_BOARD] "[YOUR_PRIMARY_JOB_TITLE_1]" [YOUR_CITY]
+site:[YOUR_JOB_BOARD] "[YOUR_PRIMARY_JOB_TITLE_2]" [YOUR_CITY]
 site:[YOUR_JOB_BOARD] "[YOUR_KEY_SKILL]" [YOUR_CITY]
-site:linkedin.com/jobs "[YOUR_PRIMARY_JOB_TITLE]" [YOUR_COUNTRY]
+site:linkedin.com/jobs "[YOUR_PRIMARY_JOB_TITLE_1]" [YOUR_COUNTRY]
 ```
 
 ### Priority 2: [YOUR_DOMAIN_EXPERTISE]

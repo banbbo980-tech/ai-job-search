@@ -38,6 +38,7 @@ For `documents`, list files under:
 - `documents/linkedin/`
 - `documents/diplomas/`
 - `documents/references/`
+- `documents/postings/`
 - `documents/applications/`
 
 State that `documents/README.md` and folder structure are preserved.

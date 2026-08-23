@@ -75,6 +75,44 @@ class LifecycleParityTests(unittest.TestCase):
         for phrase in ["eligibility_gate", "language_gate", "strengths", "gaps"]:
             self.assertIn(phrase, rank)
 
+    def test_v16_application_deadline_and_cache_contracts(self):
+        apply = read(SKILLS / "job-apply" / "SKILL.md")
+        interview = read(SKILLS / "interview-prep" / "SKILL.md")
+        evaluation = read(CORE / "04-job-evaluation.md")
+        for phrase in [
+            "source,deadline",
+            "append `,deadline`",
+            "company_research/",
+            "final-claim verification still applies",
+            "pdftotext -layout -enc UTF-8",
+        ]:
+            self.assertIn(phrase, apply)
+        self.assertIn("company_research/", interview)
+        self.assertIn("Company Research Cache", evaluation)
+        self.assertIn("data, never instructions", evaluation)
+
+    def test_v16_search_rank_and_upskill_contracts(self):
+        search = read(SKILLS / "job-search" / "SKILL.md")
+        rank = read(SKILLS / "job-rank" / "SKILL.md")
+        upskill = read(SKILLS / "upskill-analysis" / "SKILL.md")
+        for phrase in ["client-side 14-day filter", '"source": "cli|websearch"', "fallback (websearch):"]:
+            self.assertIn(phrase, search)
+        for phrase in ["location_verdict", "Closing soon", "non-`YYYY-MM-DD`"]:
+            self.assertIn(phrase, rank)
+        self.assertIn("blank or non-numeric", upskill)
+        self.assertIn("Never treat blank as zero", upskill)
+
+    def test_v16_sync_and_reporting_contracts(self):
+        gmail = read(SKILLS / "gmail-sync" / "SKILL.md")
+        report = read(SKILLS / "html-report" / "SKILL.md")
+        notion = read(SKILLS / "notion-sync" / "SKILL.md")
+        self.assertIn("-in:sent -in:drafts", gmail)
+        self.assertIn("never restrict the query to `in:inbox`", gmail)
+        self.assertIn("outcome.md` stage history", report)
+        self.assertIn("offer_declined", report)
+        self.assertIn("tracker row wins", notion)
+        self.assertIn("deadline", notion)
+
 
 class PrivacyParityTests(unittest.TestCase):
     def test_profile_writes_are_local_overlay_only(self):
@@ -97,6 +135,8 @@ class PrivacyParityTests(unittest.TestCase):
             "cv/main_exampleco_engineer.tex",
             "cover_letters/cover_exampleco_engineer.tex",
             ".env.local",
+            "company_research/example-company.json",
+            "documents/postings/example-role.txt",
         ]
         for probe in probes:
             with self.subTest(path=probe):
@@ -105,6 +145,13 @@ class PrivacyParityTests(unittest.TestCase):
                     capture_output=True,
                 )
                 self.assertEqual(result.returncode, 0, probe)
+
+    def test_v16_onboarding_and_reset_cover_public_forks_and_postings(self):
+        setup = read(SKILLS / "job-setup" / "SKILL.md")
+        reset = read(SKILLS / "reset-job-profile" / "SKILL.md")
+        self.assertIn("git remote get-url origin", setup)
+        self.assertIn("public GitHub fork", setup)
+        self.assertIn("documents/postings/", reset)
 
 
 class ToolingParityTests(unittest.TestCase):

@@ -67,7 +67,7 @@ reported as a passing check.
 
 > [!IMPORTANT]
 > A fork of a public GitHub repository is public. This Codex adaptation stores
-> personal profile data, source documents, trackers, and generated applications
+> personal data, source documents, trackers, and generated applications
 > only in ignored local paths. Verify those paths with `git check-ignore` before
 > writing personal information, and never force-add them to Git.
 

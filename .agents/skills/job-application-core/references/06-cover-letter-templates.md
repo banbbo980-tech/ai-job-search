@@ -1,5 +1,5 @@
 ---
-framework_version: 1.0.1
+framework_version: 1.0.2
 ---
 
 # Cover Letter Templates and Tailoring Guide
@@ -145,10 +145,15 @@ The font wrapper is mandatory — if you just move `\begin{itemize}` outside `\l
 - 3-5 bullets is ideal
 - Start each bullet with bold label or action verb
 - Use `\textbf{Label:}` for category-style bullets
+- Brace a bullet beginning with `[` as `\item {[text]}`. Otherwise LaTeX treats
+  it as an optional label and can render it outside the page/text layer.
 
 ### LaTeX Special Characters
-- Underscore: `\_`
-- Ampersand: `\&`
+- Ampersand: `\&`; percent: `\%`; dollar: `\$`; hash: `\#`; underscore: `\_`
+- Tilde: `\textasciitilde{}`; caret: `\textasciicircum{}`; backslash:
+  `\textbackslash{}`
+- An unescaped `%` silently comments out the rest of its source line even when
+  compilation succeeds.
 
 ### Non-English Cover Letters
 - Same template structure, just write content in the posting's language

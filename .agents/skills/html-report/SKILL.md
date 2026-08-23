@@ -16,8 +16,13 @@ external service is required to create it.
    drafted, active, interview, offer, successful, and closed groups. Unknown
    statuses go into an explicit Other bucket.
 3. Compute totals, response rate, interview rate, offer rate, recent activity,
-   channel mix, status mix, and fit distribution. State denominators; do not turn
-   missing dates or scores into zeroes.
+   channel mix, status mix, and fit distribution. Exclude `drafted` rows from
+   application rates because nothing was submitted. Derive funnel stages from
+   current status plus archived `outcome.md` stage history, so a later rejection
+   does not erase an interview that happened. Define rejection rate as true
+   rejections (`rejected` and `no_response`) divided by final outcomes;
+   `offer_declined` and `withdrawn` are closed but are not employer rejections.
+   State denominators; do not turn missing dates or scores into zeroes.
 4. Generate one self-contained HTML file with semantic headings, accessible data
    tables, compact summary metrics, inline CSS, and optional inline SVG charts.
    Escape every local value before inserting it into HTML or attributes. Use no

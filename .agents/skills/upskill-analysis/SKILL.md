@@ -22,7 +22,10 @@ Analyze skill gaps honestly and produce a saved learning plan.
    - Merge tracker rows with `status: "ranked"` entries from
      `job_scraper/seen_jobs.json` whose `rank_score >= 45`.
    - Dedupe case-insensitively by company+role; the tracker row and its numeric
-     fit rating win when both sources contain the job.
+     fit rating win when both sources contain the job. A blank or non-numeric
+     `fit_rating` falls back to a matched ranked entry's `rank_score`; without
+     that fallback, skip and count the row. Never treat blank as zero because
+     that would give an unknown fit the maximum gap weight.
    - Prefer persisted `gaps` arrays over inference from role/sector/notes. A
      ranked entry without gaps contributes nothing; count and report it instead
      of backfilling from a title.
