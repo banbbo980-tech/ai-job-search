@@ -152,6 +152,11 @@ class PrivacyParityTests(unittest.TestCase):
         self.assertIn("git remote get-url origin", setup)
         self.assertIn("public GitHub fork", setup)
         self.assertIn("documents/postings/", reset)
+        self.assertIn("documents/cv/codex_profile/", reset)
+        self.assertIn("04-job-evaluation.md", reset)
+        self.assertIn("search-queries.md", reset)
+        self.assertIn("search-preferences.md", reset)
+        self.assertIn("Do not describe evaluation preferences or search", reset)
 
 
 class ToolingParityTests(unittest.TestCase):

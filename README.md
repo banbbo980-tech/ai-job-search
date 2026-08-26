@@ -238,6 +238,14 @@ advisory only; they never merge, cherry-pick, or push.
 - `docs/UPSTREAM_SYNC_POLICY.md` - fork and branch model
 - `CHANGELOG.md` - official release history retained from upstream
 - `tools/README_SALARY_TOOL.md` - optional local salary data
+- `tools/check_framework_version.py` - framework-version guard for skill changes
+- `tools/check_upstream_updates.py` - official update checker
+- `tools/convert_salary_excel.py` - salary spreadsheet converter
+- `tools/lint_skills.py` - skill and settings lint
+- `tools/robots_check.py` - robots.txt access checker
+- `tools/security_guards.py` - privacy and repository safety checks
+- `tools/upstream_triage.py` - advisory upstream commit triage
+- `tools/verify_pdf.py` - PDF text and page-count verification
 
 ## Acknowledgements
 
